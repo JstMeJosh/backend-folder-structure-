@@ -1,95 +1,183 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Anatomy of a Backend That Works</title>
-  <!-- Tailwind CSS CDN -->
+  <title>VS Code - Backend Architecture Sandbox</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Google Fonts (JetBrains Mono for code feel) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=Segoe+UI:wght@400;600&display=swap" rel="stylesheet">
   <style>
     body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .code-font {
       font-family: 'JetBrains Mono', monospace;
     }
   </style>
 </head>
-<body class="bg-[#0d1117] text-[#c9d1d9] min-h-screen flex flex-col">
+<body class="bg-[#1e1e1e] text-[#cccccc] h-full flex flex-col overflow-hidden select-none">
 
-  <!-- Header / Navigation Bar -->
-  <header class="bg-[#161b22] border-b border-[#21262d] px-6 py-4 flex justify-between items-center">
-    <div class="flex items-center space-gap-2">
-      <span class="text-green-400 font-bold text-lg">⚡ backend-anatomy</span>
-      <span class="text-[#8b949e] text-sm hidden sm:inline">/ production-ready-structure</span>
+  <!-- VS Code Top Window Bar -->
+  <header class="bg-[#3c3c3c] text-[#cccccc] text-xs h-9 flex items-center justify-between px-3 border-b border-[#2b2b2b] shrink-0">
+    <div class="flex items-center space-x-4">
+      <span class="text-blue-400 font-bold text-sm">⚡</span>
+      <div class="hidden md:flex space-x-3">
+        <span class="hover:bg-[#505050] px-2 py-0.5 rounded cursor-pointer">File</span>
+        <span class="hover:bg-[#505050] px-2 py-0.5 rounded cursor-pointer">Edit</span>
+        <span class="hover:bg-[#505050] px-2 py-0.5 rounded cursor-pointer">Selection</span>
+        <span class="hover:bg-[#505050] px-2 py-0.5 rounded cursor-pointer">View</span>
+        <span class="hover:bg-[#505050] px-2 py-0.5 rounded cursor-pointer">Go</span>
+      </div>
     </div>
-    <div class="bg-red-500/10 text-red-400 px-3 py-1 rounded-full text-xs font-semibold border border-red-500/20 animate-pulse">
-      Live Sandbox
+    <div class="text-[11px] text-[#858585] bg-[#2d2d2d] px-16 py-1 rounded border border-[#454545] truncate max-w-sm md:max-w-md">
+      server.js — backend-anatomy - Visual Studio Code
+    </div>
+    <div class="flex space-x-2">
+      <div class="w-3 h-3 rounded-full bg-[#ff5f56]"></div>
+      <div class="w-3 h-3 rounded-full bg-[#ffbd2e]"></div>
+      <div class="w-3 h-3 rounded-full bg-[#27c93f]"></div>
     </div>
   </header>
 
-  <!-- Main IDE Workspace -->
-  <main class="flex-1 flex flex-col md:flex-row overflow-hidden">
+  <!-- Workspace Container -->
+  <div class="flex-1 flex overflow-hidden">
     
-    <!-- Left Sidebar: Folder Tree Explorer -->
-    <aside class="w-full md:w-80 bg-[#161b22] border-r border-[#21262d] p-4 flex flex-col shrink-0">
-      <div class="text-[#8b949e] text-xs font-semibold uppercase tracking-wider mb-4 flex justify-between items-center">
-        <span>Workspace Explorer</span>
-        <span class="text-xs text-gray-500">v1.0.0</span>
+    <!-- 1. Activity Bar (Far Left Icon strip) -->
+    <nav class="w-12 bg-[#333333] flex flex-col justify-between items-center py-2 border-r border-[#252526] shrink-0">
+      <div class="flex flex-col space-y-4 w-full items-center">
+        <!-- Explorer (Active) -->
+        <button class="w-full py-2 border-l-2 border-blue-500 text-white focus:outline-none" title="Explorer">
+          📁
+        </button>
+        <!-- Search -->
+        <button class="w-full py-2 text-gray-500 hover:text-gray-300 focus:outline-none" title="Search">
+          🔍
+        </button>
+        <!-- Source Control -->
+        <button class="w-full py-2 text-gray-500 hover:text-gray-300 focus:outline-none relative" title="Source Control">
+          🌿
+          <span class="absolute top-1.5 right-2 bg-blue-500 text-white text-[9px] px-1 rounded-full font-bold">2</span>
+        </button>
+        <!-- Extensions -->
+        <button class="w-full py-2 text-gray-500 hover:text-gray-300 focus:outline-none" title="Extensions">
+          🧩
+        </button>
+      </div>
+      <div class="text-gray-500 text-sm hover:text-white cursor-pointer" title="Settings">
+        ⚙️
+      </div>
+    </nav>
+
+    <!-- 2. Primary Sidebar (VS Code Explorer) -->
+    <aside class="w-64 bg-[#252526] border-r border-[#1e1e1e] flex flex-col shrink-0">
+      <div class="px-5 py-2.5 flex justify-between items-center border-b border-[#1e1e1e]">
+        <span class="text-[11px] font-bold tracking-wider uppercase text-[#bbbbbb]">Explorer</span>
+        <span class="text-xs text-gray-500">...</span>
       </div>
       
-      <!-- File Tree Container -->
-      <div class="space-y-1.5 overflow-y-auto max-h-[300px] md:max-h-none flex-1 pr-1" id="fileTree">
-        <!-- Folders & Files generated dynamically via JS -->
+      <!-- Workspace Folder Header -->
+      <div class="px-4 py-1.5 bg-[#2d2d2d] flex items-center text-[11px] font-bold tracking-wide text-gray-300 uppercase">
+        <span class="mr-1.5">▼</span> BACKEND-ANATOMY
+      </div>
+      
+      <!-- Nested Explorer Tree Container -->
+      <div class="flex-1 overflow-y-auto px-1 py-2 space-y-0.5 text-sm" id="fileTree">
+        <!-- Folders/Files injected dynamic with custom nesting padding -->
       </div>
     </aside>
 
-    <!-- Right Panel: The Dynamic Interactive Editor -->
-    <section class="flex-1 bg-[#0d1117] p-6 flex flex-col justify-center items-center text-center transition-all duration-300" id="editorView">
-      <!-- Default Welcoming Screen -->
-      <div id="defaultPrompt" class="max-w-md space-y-4">
-        <div class="text-6xl animate-bounce">📂</div>
-        <h2 class="text-2xl font-bold text-white">Anatomy of a Backend</h2>
-        <p class="text-[#8b949e] text-sm">
-          Select any folder or file from the explorer sidebar on the left to unpack its role, logic flow, and TikTok caption vibe!
-        </p>
-        <p class="text-xs text-gray-500 border border-dashed border-[#21262d] p-2 rounded">
-          Tip: Click on <span class="text-yellow-500">.env</span> or <span class="text-purple-400">node_modules</span> for the fun secrets.
-        </p>
-      </div>
-
-      <!-- Active Content Screen (Hidden by default, shown via JS) -->
-      <div id="activeContent" class="hidden w-full max-w-3xl text-left space-y-6">
-        <!-- Breadcrumb & Header -->
-        <div class="flex items-center space-x-2 text-sm text-[#8b949e]">
-          <span>root</span>
-          <span>/</span>
-          <span id="activePath" class="text-blue-400"></span>
-        </div>
-
-        <div class="flex items-center space-x-3">
-          <span id="activeIcon" class="text-3xl"></span>
-          <h1 id="activeTitle" class="text-3xl font-extrabold text-white tracking-tight"></h1>
-        </div>
-
-        <hr class="border-[#21262d]" />
-
-        <!-- Educative Section -->
-        <div class="bg-[#161b22] border border-[#21262d] rounded-lg p-5 shadow-lg">
-          <span class="text-xs text-green-400 uppercase tracking-widest font-bold block mb-2">🎓 Educative Breakdown</span>
-          <p id="activeEducative" class="text-[#c9d1d9] leading-relaxed text-sm md:text-base"></p>
-        </div>
-
-        <!-- TikTok Vibe Callout -->
-        <div class="bg-gradient-to-r from-pink-500/10 to-purple-500/10 border border-purple-500/20 rounded-lg p-5 shadow-lg">
-          <span class="text-xs text-purple-400 uppercase tracking-widest font-bold block mb-2">🎬 TikTok Script / Vibe</span>
-          <p id="activeVibe" class="text-[#e2e8f0] italic leading-relaxed text-sm md:text-base border-l-2 border-purple-500 pl-3"></p>
+    <!-- 3. Central Editing & Terminal Zone -->
+    <section class="flex-1 flex flex-col bg-[#1e1e1e] overflow-hidden">
+      
+      <!-- VS Code Editor Tab Bar -->
+      <div class="bg-[#2d2d2d] h-9 flex border-b border-[#1e1e1e] overflow-x-auto shrink-0" id="tabBar">
+        <!-- Active open files/folders tabs dynamically managed -->
+        <div class="bg-[#1e1e1e] text-white px-4 flex items-center space-x-2 border-r border-[#1e1e1e] h-full text-xs cursor-pointer">
+          <span>🏠 README.md</span>
         </div>
       </div>
+
+      <!-- Main Text Area (The Code Window) -->
+      <div class="flex-1 p-6 overflow-y-auto" id="editorWindow">
+        <!-- Welcome view by default -->
+        <div id="defaultScreen" class="h-full flex flex-col items-center justify-center text-center space-y-4">
+          <div class="text-6xl animate-pulse">💻</div>
+          <h2 class="text-xl font-semibold text-white">Select a module to inspect</h2>
+          <p class="text-xs text-[#858585] max-w-sm">
+            Click on folders or files in your workspace tree explorer to view dynamic code breakdowns and ready-made TikTok captions.
+          </p>
+        </div>
+
+        <!-- Dynamic Content Layout -->
+        <div id="editorContent" class="hidden space-y-6 max-w-4xl">
+          <div class="flex items-center space-x-2.5">
+            <span id="editorIcon" class="text-3xl"></span>
+            <div>
+              <h1 id="editorTitle" class="text-2xl font-bold text-white tracking-tight code-font"></h1>
+              <p class="text-xs text-[#858585] code-font">Path: <span id="editorPath" class="text-[#4fc1ff]"></span></p>
+            </div>
+          </div>
+
+          <!-- The Visual Card Concept -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            
+            <!-- Educative Box -->
+            <div class="bg-[#252526] border border-[#3c3c3c] rounded p-4 relative overflow-hidden">
+              <div class="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
+              <h3 class="text-xs font-bold text-blue-400 tracking-wider uppercase mb-2">🎓 Technical Blueprint</h3>
+              <p id="editorEducative" class="text-sm text-[#cccccc] leading-relaxed"></p>
+            </div>
+
+            <!-- TikTok Creative Box -->
+            <div class="bg-gradient-to-r from-purple-500/5 to-pink-500/5 border border-purple-500/20 rounded p-4 relative">
+              <div class="absolute top-0 left-0 w-1 h-full bg-purple-500"></div>
+              <h3 class="text-xs font-bold text-purple-400 tracking-wider uppercase mb-2">🎬 
+                
+                Learners Angle</h3>
+              <p id="editorVibe" class="text-sm italic text-[#e2e8f0] leading-relaxed pl-2"></p>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Integrated VS Code Terminal (Bottom Panel) -->
+      <footer class="h-44 bg-[#1e1e1e] border-t border-[#2b2b2b] flex flex-col shrink-0">
+        <div class="bg-[#252526] h-8 flex items-center justify-between px-4 text-xs border-b border-[#2d2d2d]">
+          <div class="flex space-x-4">
+            <span class="text-white border-b-2 border-blue-500 pb-1.5 font-semibold cursor-pointer">TERMINAL</span>
+            <span class="text-gray-400 hover:text-white cursor-pointer">PROBLEMS</span>
+            <span class="text-gray-400 hover:text-white cursor-pointer">OUTPUT</span>
+            <span class="text-gray-400 hover:text-white cursor-pointer">DEBUG CONSOLE</span>
+          </div>
+          <div class="text-gray-500">node v20.11.0</div>
+        </div>
+        <div class="flex-1 p-3 overflow-y-auto code-font text-xs text-[#858585] space-y-1.5 bg-[#181818]" id="terminalOutput">
+          <div><span class="text-green-500">user@unilag-dev:~/workspace/backend-anatomy$</span> npm run dev</div>
+          <div class="text-gray-400">[nodemon] 3.0.3 - starting `node server.js`</div>
+          <div class="text-[#c9d1d9] font-medium">⚡ Server online! Listening continuously on Port 5000...</div>
+          <div class="text-blue-400 font-medium">📂 Database state: Connected successfully to mongoDB_cluster [V1]</div>
+        </div>
+      </footer>
+
     </section>
+  </div>
 
-  </main>
+  <!-- VS Code Status Bar -->
+  <footer class="bg-[#007acc] text-white text-[11px] h-6 flex items-center justify-between px-3 shrink-0">
+    <div class="flex items-center space-x-3">
+      <span class="bg-[#1f8ad2] px-2 py-0.5 font-bold">✓ Master</span>
+      <span>⚠ 0</span>
+      <span>⊗ 0</span>
+    </div>
+    <div class="flex items-center space-x-4">
+      <span>UTF-8</span>
+      <span>JavaScript</span>
+      <span>Ln 1, Col 1</span>
+    </div>
+  </footer>
 
   <script src="app.js"></script>
 </body>
