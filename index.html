@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VS Code - Backend Architecture Sandbox</title>
+  <title>Developer Sandbox — Backend Architecture Explorer</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     body {
       font-family: 'Inter', sans-serif;
@@ -15,17 +15,17 @@
     .code-font {
       font-family: 'Fira Code', monospace;
     }
-    /* Custom scrollbar for realistic IDE scroll */
+    /* Custom scrollbars for realistic IDE scroll */
     ::-webkit-scrollbar {
-      width: 10px;
-      height: 10px;
+      width: 8px;
+      height: 8px;
     }
     ::-webkit-scrollbar-track {
       background: #1e1e1e;
     }
     ::-webkit-scrollbar-thumb {
       background: #37373d;
-      border-radius: 5px;
+      border-radius: 4px;
     }
     ::-webkit-scrollbar-thumb:hover {
       background: #4f4f56;
@@ -42,11 +42,10 @@
         <span class="hover:bg-[#505050] px-2 py-0.5 rounded cursor-pointer">Edit</span>
         <span class="hover:bg-[#505050] px-2 py-0.5 rounded cursor-pointer">Selection</span>
         <span class="hover:bg-[#505050] px-2 py-0.5 rounded cursor-pointer">View</span>
-        <span class="hover:bg-[#505050] px-2 py-0.5 rounded cursor-pointer">Go</span>
       </div>
     </div>
-    <div class="text-[11px] text-[#858585] bg-[#2d2d2d] px-16 py-1 rounded border border-[#454545] truncate max-w-sm md:max-w-md">
-      server.js — backend-anatomy - Visual Studio Code
+    <div class="text-[11px] text-[#858585] bg-[#2d2d2d] px-8 sm:px-16 py-1 rounded border border-[#454545] truncate max-w-[180px] sm:max-w-md">
+      server.js — backend-anatomy
     </div>
     <div class="flex space-x-2">
       <div class="w-3 h-3 rounded-full bg-[#ff5f56]"></div>
@@ -55,32 +54,28 @@
     </div>
   </header>
 
-  <div class="flex-1 flex overflow-hidden">
+  <div class="flex-1 flex flex-col md:flex-row overflow-hidden">
     
-    <nav class="w-12 bg-[#333333] flex flex-col justify-between items-center py-2 border-r border-[#252526] shrink-0">
+    <nav class="hidden md:flex w-12 bg-[#333333] flex-col justify-between items-center py-2 border-r border-[#252526] shrink-0">
       <div class="flex flex-col space-y-4 w-full items-center">
         <button class="w-full py-2 border-l-2 border-blue-500 text-white focus:outline-none" title="Explorer">📁</button>
         <button class="w-full py-2 text-gray-500 hover:text-gray-300 focus:outline-none" title="Search">🔍</button>
-        <button class="w-full py-2 text-gray-500 hover:text-gray-300 focus:outline-none relative" title="Source Control">
-          🌿
-          <span class="absolute top-1.5 right-2 bg-blue-500 text-white text-[9px] px-1 rounded-full font-bold">3</span>
-        </button>
         <button class="w-full py-2 text-gray-500 hover:text-gray-300 focus:outline-none" title="Extensions">🧩</button>
       </div>
       <div class="text-gray-500 text-sm hover:text-white cursor-pointer" title="Settings">⚙️</div>
     </nav>
 
-    <aside class="w-64 bg-[#252526] border-r border-[#1e1e1e] flex flex-col shrink-0">
+    <aside class="w-full md:w-64 bg-[#252526] border-b md:border-b-0 md:border-r border-[#1e1e1e] flex flex-col shrink-0">
       <div class="px-5 py-2.5 flex justify-between items-center border-b border-[#1e1e1e]">
         <span class="text-[11px] font-bold tracking-wider uppercase text-[#bbbbbb]">Explorer</span>
-        <span class="text-xs text-gray-500">...</span>
+        <span class="text-xs text-gray-500">Workspace</span>
       </div>
       
       <div class="px-4 py-1.5 bg-[#2d2d2d] flex items-center text-[11px] font-bold tracking-wide text-gray-300 uppercase">
         <span class="mr-1.5 text-blue-400">▼</span> BACKEND-ANATOMY
       </div>
       
-      <div class="flex-1 overflow-y-auto px-1 py-2 space-y-0.5 text-sm" id="fileTree"></div>
+      <div class="max-h-40 md:max-h-none flex-1 overflow-y-auto px-1 py-2 space-y-0.5 text-sm" id="fileTree"></div>
     </aside>
 
     <section class="flex-1 flex flex-col bg-[#1e1e1e] overflow-hidden">
@@ -94,10 +89,10 @@
       <div class="flex-1 flex flex-col lg:flex-row overflow-hidden" id="editorWindow">
         
         <div id="defaultScreen" class="flex-1 flex flex-col items-center justify-center text-center p-6 space-y-4">
-          <div class="text-6xl animate-bounce">📂</div>
-          <h2 class="text-xl font-semibold text-white">Interactive Backend Playground</h2>
+          <div class="text-6xl animate-pulse">📂</div>
+          <h2 class="text-xl font-semibold text-white">Interactive Backend Architecture</h2>
           <p class="text-xs text-[#858585] max-w-sm leading-relaxed">
-            Select any folder or configuration file from the sidebar on the left. Explore educational breakdowns, mock production-level files, and engagement angles optimized for TikTok.
+            Select any file or folder from the explorer to preview production code syntax and read architectural deployment details.
           </p>
         </div>
 
@@ -105,17 +100,17 @@
           
           <div class="flex-1 border-b lg:border-b-0 lg:border-r border-[#2b2b2b] flex flex-col overflow-hidden bg-[#181818]">
             <div class="bg-[#202020] px-4 py-1.5 border-b border-[#2b2b2b] text-[11px] text-[#858585] font-bold tracking-wider flex justify-between items-center">
-              <span>📝 CODE PREVIEW</span>
+              <span>📝 IMPLEMENTATION PREVIEW</span>
               <span class="text-blue-400">javascript</span>
             </div>
-            <pre class="flex-1 p-4 overflow-auto code-font text-[13px] leading-relaxed text-[#98c379]"><code id="codeViewer" class="block"></code></pre>
+            <pre class="flex-1 p-4 overflow-auto code-font text-[13px] leading-relaxed text-[#a3b899]"><code id="codeViewer" class="block"></code></pre>
           </div>
 
-          <div class="w-full lg:w-[450px] flex flex-col overflow-y-auto bg-[#1e1e1e] p-6 space-y-6 shrink-0">
+          <div class="w-full lg:w-[400px] flex flex-col overflow-y-auto bg-[#1e1e1e] p-6 space-y-6 shrink-0">
             <div class="flex items-center space-x-3">
               <span id="editorIcon" class="text-3xl"></span>
               <div>
-                <h1 id="editorTitle" class="text-2xl font-bold text-white tracking-tight code-font"></h1>
+                <h1 id="editorTitle" class="text-xl font-bold text-white tracking-tight code-font"></h1>
                 <p class="text-xs text-[#858585] code-font">Path: <span id="editorPath" class="text-[#4fc1ff]"></span></p>
               </div>
             </div>
@@ -124,34 +119,33 @@
 
             <div class="bg-[#252526] border border-[#3c3c3c] rounded p-4 relative overflow-hidden">
               <div class="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
-              <h3 class="text-xs font-bold text-blue-400 tracking-wider uppercase mb-1.5">🎓 Educative Breakdown</h3>
+              <h3 class="text-xs font-bold text-blue-400 tracking-wider uppercase mb-2">🎓 Functional Purpose</h3>
               <p id="editorEducative" class="text-xs text-[#cccccc] leading-relaxed"></p>
             </div>
 
-            <div class="bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded p-4 relative">
-              <div class="absolute top-0 left-0 w-1 h-full bg-purple-500"></div>
-              <h3 class="text-xs font-bold text-purple-400 tracking-wider uppercase mb-1.5">🎬 TikTok Script / Vibe</h3>
-              <p id="editorVibe" class="text-xs italic text-[#e2e8f0] leading-relaxed pl-2"></p>
+            <div class="bg-[#1a2333] border border-[#2b3a54] rounded p-4 relative">
+              <div class="absolute top-0 left-0 w-1 h-full bg-blue-400"></div>
+              <h3 class="text-xs font-bold text-blue-300 tracking-wider uppercase mb-2">ℹ️ System Integration Note</h3>
+              <p id="editorVibe" class="text-xs text-[#b8c5db] leading-relaxed"></p>
             </div>
           </div>
 
         </div>
       </div>
 
-      <footer class="h-44 bg-[#1e1e1e] border-t border-[#2b2b2b] flex flex-col shrink-0">
+      <footer class="h-32 sm:h-40 bg-[#1e1e1e] border-t border-[#2b2b2b] flex flex-col shrink-0">
         <div class="bg-[#252526] h-8 flex items-center justify-between px-4 text-xs border-b border-[#2d2d2d]">
           <div class="flex space-x-4">
             <span class="text-white border-b-2 border-blue-500 pb-1.5 font-semibold cursor-pointer">TERMINAL</span>
             <span class="text-gray-400 hover:text-white cursor-pointer">PROBLEMS</span>
-            <span class="text-gray-400 hover:text-white cursor-pointer font-light">OUTPUT</span>
           </div>
           <div class="text-gray-500">node v20.11.0</div>
         </div>
         <div class="flex-1 p-3 overflow-y-auto code-font text-[11px] text-[#858585] space-y-1 bg-[#151515]" id="terminalOutput">
           <div><span class="text-green-500">user@unilag-dev:~/workspace/backend-anatomy$</span> npm run dev</div>
-          <div class="text-gray-500">[nodemon] 3.0.3 - starting `node server.js`</div>
-          <div class="text-[#c9d1d9]">⚡ Server online! Listening continuously on Port 5000...</div>
-          <div class="text-blue-500">📂 Database state: Connected successfully to mongoDB_cluster</div>
+          <div class="text-gray-500">[nodemon] starting `node server.js`</div>
+          <div class="text-[#c9d1d9]">⚡ Server active. Listening on Port 5000...</div>
+          <div class="text-blue-500">📂 Database connection stream active</div>
         </div>
       </footer>
 
@@ -170,233 +164,6 @@
     </div>
   </footer>
 
-  <script>
-    const structureData = [
-      {
-        name: "config",
-        type: "folder",
-        icon: "🎛️",
-        title: "/config",
-        path: "config/",
-        educative: "Central command center of your backend. It pulls configuration settings, database connections, and environment credentials into organized modules so you never have to hardcode keys or URLs directly in your core logic.",
-        vibe: "The control room. It handles passport control and the secret handshakes needed to talk to your database or external APIs.",
-        code: `// config/db.js\nconst mongoose = require('mongoose');\n\nconst connectDatabase = async () => {\n  try {\n    const conn = await mongoose.connect(process.env.MONGO_URI);\n    console.log(\`MongoDB Connected: \${conn.connection.host}\`);\n  } catch (error) {\n    console.error(\`Database connection failed: \${error.message}\`);\n    process.exit(1);\n  }\n};\n\nmodule.exports = connectDatabase;`
-      },
-      {
-        name: "constants",
-        type: "folder",
-        icon: "🧊",
-        title: "/constants",
-        path: "constants/",
-        educative: "Application anchors. This folder exports global read-only values that stay completely static (like user role strings, strict HTTP status codes, or consistent error configurations) so you never break your logic with a simple typo.",
-        vibe: "The anchors. Keeps hardcoded strings safe so you don't break your server by spelling 'SUCCESS' three different ways.",
-        code: `// constants/roles.js\nconst USER_ROLES = {\n  ADMIN: 'ADMIN',\n  USER: 'USER',\n  GUEST: 'GUEST'\n};\n\nconst STATUS_CODES = {\n  OK: 200,\n  CREATED: 201,\n  BAD_REQUEST: 400,\n  UNAUTHORIZED: 401,\n  INTERNAL_ERROR: 500\n};\n\nmodule.exports = { USER_ROLES, STATUS_CODES };`
-      },
-      {
-        name: "routes",
-        type: "folder",
-        icon: "🚦",
-        title: "/routes",
-        path: "routes/",
-        educative: "The URL highway map of your API. It maps specific endpoints (like /api/v1/users) to their corresponding controllers, dictating precisely which HTTP methods (GET, POST, PUT, DELETE) are permitted.",
-        vibe: "The traffic cop. Redirects frontend requests to the proper rooms. If they use the wrong pathway, they hit a 404 dead end.",
-        code: `// routes/auth.routes.js\nconst express = require('express');\nconst router = express.Router();\nconst { loginUser, registerUser } = require('../controllers/authController');\nconst { validateSchema } = require('../validation/validate');\nconst { userSchema } = require('../validation/schemas/userSchema');\n\nrouter.post('/register', validateSchema(userSchema), registerUser);\nrouter.post('/login', loginUser);\n\nmodule.exports = router;`
-      },
-      {
-        name: "middleware",
-        type: "folder",
-        icon: "🥷",
-        title: "/middleware",
-        path: "middleware/",
-        educative: "Request interceptors. Functions that run right in the middle of the request-response cycle. Crucial for handling auth token handshakes, requests logs, rate-limiting, and early defense validation.",
-        vibe: "The VIP bouncer. Inspects incoming login tokens and blocks sketchy actors before they can even glance at the database.",
-        code: `// middleware/auth.js\nconst jwt = require('jsonwebtoken');\n\nconst protect = (req, res, next) => {\n  const token = req.headers.authorization?.split(' ')[1];\n  if (!token) {\n    return res.status(401).json({ error: "Access Denied. No token provided." });\n  }\n  try {\n    req.user = jwt.verify(token, process.env.JWT_SECRET);\n    next();\n  } catch (error) {\n    res.status(401).json({ error: "Invalid Token" });\n  }\n};\n\nmodule.exports = { protect };`
-      },
-      {
-        name: "validation",
-        type: "folder",
-        icon: "🧼",
-        title: "/validation",
-        path: "validation/",
-        educative: "The security checkpoint. Contains schema definitions (using packages like Zod or Joi) and validation engines (validate.js) that strictly evaluate incoming requests payloads (req.body) before database parsing.",
-        vibe: "The TSA checkpoint. Checks your data format at the door. Trying to send letters in a phone number? Denied.",
-        code: `// validation/validate.js\nconst validateSchema = (schema) => (req, res, next) => {\n  const result = schema.safeParse(req.body);\n  if (!result.success) {\n    return res.status(400).json({\n      errors: result.error.errors.map(err => err.message)\n    });\n  }\n  next();\n};`
-      },
-      {
-        name: "controllers",
-        type: "folder",
-        icon: "🧠",
-        title: "/controllers",
-        path: "controllers/",
-        educative: "The brains of your operation. Controllers coordinate the data processing. They parse client requests, retrieve or send structural operations to the models, and return response codes/payloads safely back.",
-        vibe: "The kitchen chefs. They take the frontend's raw order, cook the data, plate it, and send it out to be served.",
-        code: `// controllers/authController.js\nconst { registerNewUser } = require('../services/userService');\n\nconst registerUser = async (req, res) => {\n  try {\n    const user = await registerNewUser(req.body);\n    res.status(201).json({ success: true, data: user });\n  } catch (err) {\n    res.status(500).json({ error: err.message });\n  }\n};\n\nmodule.exports = { registerUser };`
-      },
-      {
-        name: "services",
-        type: "folder",
-        icon: "💼",
-        title: "/services",
-        path: "services/",
-        educative: "Heavy-duty logic layers. Abstracts third-party system dependencies and database interactions (like Stripe payouts, email triggers, or custom search indexes) out of controllers, keeping your routes lightweight.",
-        vibe: "The outsourced worker bees. Controllers take the credit, but services handle the messy, exhausting API requests.",
-        code: `// services/userService.js\nconst User = require('../models/User');\nconst bcrypt = require('bcrypt');\n\nconst registerNewUser = async (userData) => {\n  const hashedPassword = await bcrypt.hash(userData.password, 10);\n  return await User.create({\n    username: userData.username,\n    email: userData.email,\n    password: hashedPassword\n  });\n};\n\nmodule.exports = { registerNewUser };`
-      },
-      {
-        name: "models",
-        type: "folder",
-        icon: "📐",
-        title: "/models",
-        path: "models/",
-        educative: "The database schematics. Models declare formatting blueprints using toolkits like Mongoose, Prisma, or Sequelize. They force raw data objects to strictly match structured specifications.",
-        vibe: "The rigid blueprint. Tells the database: 'You must look exactly like this, or you aren't allowed to exist.' strict rules only.",
-        code: `// models/User.js\nconst mongoose = require('mongoose');\n\nconst UserSchema = new mongoose.Schema({\n  username: { type: String, required: true },\n  email: { type: String, required: true, unique: true },\n  password: { type: String, required: true }\n}, { timestamps: true });\n\nmodule.exports = mongoose.model('User', UserSchema);`
-      },
-      {
-        name: "templates",
-        type: "folder",
-        icon: "🎨",
-        title: "/templates",
-        path: "templates/",
-        educative: "Dynamic structure engines. Stores raw formatting layouts like HTML, EJS, or Pug layouts. Primarily leveraged on the backend to render emails or generate clean PDF documents dynamically.",
-        vibe: "The wardrobe department. Because raw data looks terrible in a user's inbox, we dress it up in HTML before sending it.",
-        code: `\n<div style="font-family: Arial, sans-serif;">\n  <h1>Welcome back, {{username}}!</h1>\n  <p>Your dynamic server-rendered token is ready for action.</p>\n  <a href="{{url}}">Go to Dashboard</a>\n</div>`
-      },
-      {
-        name: "package.json",
-        type: "file",
-        icon: "📜",
-        title: "package.json",
-        path: "package.json",
-        educative: "Your Node.js manifest. Outlines project identification metrics (name, scripts, authors) alongside metadata defining which explicit external dependency layers must be fetched to successfully build.",
-        vibe: "The recipe card. The absolute core file containing startup commands and the main grocery list of packages.",
-        code: `{\n  "name": "unilag-backend-anatomy",\n  "version": "1.0.0",\n  "main": "server.js",\n  "scripts": {\n    "start": "node server.js",\n    "dev": "nodemon server.js"\n  },\n  "dependencies": {\n    "bcrypt": "^5.1.1",\n    "express": "^4.19.2",\n    "mongoose": "^8.2.1",\n    "zod": "^3.22.4"\n  }\n}`
-      },
-      {
-        name: "package-lock.json",
-        type: "file",
-        icon: "🔒",
-        title: "package-lock.json",
-        path: "package-lock.json",
-        educative: "The locked-down dependency tree. Tracks precise sub-dependency micro-versions at the millisecond of installations to ensure that environments across your local host and deployed clouds remain strictly identical.",
-        vibe: "The locked contract. Guarantees that if the project compiles on my machine, it won't mysteriously fail on yours.",
-        code: `{\n  "name": "unilag-backend-anatomy",\n  "version": "1.0.0",\n  "lockfileVersion": 3,\n  "requires": true,\n  "packages": {\n    "": {\n      "name": "unilag-backend-anatomy",\n      "dependencies": {\n        "express": "^4.19.2"\n      }\n    }\n  }\n}`
-      },
-      {
-        name: "node_modules",
-        type: "folder",
-        icon: "📦",
-        title: "node_modules/",
-        path: "node_modules/",
-        educative: "A compiled registry of all third-party dependencies downloaded via npm install. Unbelievably nested, as packages recursively fetch all sub-dependencies needed, expanding local project directories massively.",
-        vibe: "The black hole. Heavier than a dying star. Contains 4GB of folders just so I can parse dates. Never try to push this to GitHub.",
-        code: `// [FOLDER CONTEXT - node_modules/]\n// Absolute chaos. \n// Includes:\n//   - lodash/\n//   - body-parser/\n//   - debug/\n//   - depd/\n//   - statuses/\n// ...and 827 other nested folders you did not know existed.`
-      },
-      {
-        name: "env",
-        type: "file",
-        icon: "🔑",
-        title: ".env",
-        path: ".env",
-        educative: "Your security vault. Stores local credentials, production passwords, and highly-sensitive integration secrets outside the actual project codebase to ensure environment parity and absolute privacy.",
-        vibe: "The top-secret vault. If you show this file on screen for even a microsecond, change your identities and delete your accounts immediately.",
-        code: `PORT=5000\nMONGO_URI="mongodb+srv://admin:securePassword123@cluster0.abc.mongodb.net/prod_db"\nJWT_SECRET="super_secret_unilag_token_generator_key"\nSTRIPE_SECRET_KEY="sk_test_51O..."`
-      },
-      {
-        name: "gitignore",
-        type: "file",
-        icon: "🙈",
-        title: ".gitignore",
-        path: ".gitignore",
-        educative: "The version-control shield. Directs Git tracking engines to bypass local directories (like node_modules) or private configs (.env) to prevent catastrophic security leaks to public tracking hubs.",
-        vibe: "The cover-up. Keeps your local secrets local. Missing this file is a direct, one-way ticket to a surprise server bill.",
-        code: `node_modules/\n.env\n.env.local\ndist/\nbuild/\n.DS_Store`
-      },
-      {
-        name: "server.js",
-        type: "file",
-        icon: "🚀",
-        title: "server.js",
-        path: "server.js",
-        educative: "The entry ignition node. Starts up server frameworks like Express, coordinates active database links, loads global server processes, and binds your app to a network port to safely stream incoming traffic.",
-        vibe: "The ignition key. When you type 'npm run dev', this file wakes up the server and officially brings your logic to life.",
-        code: `// server.js\nrequire('dotenv').config();\nconst express = require('express');\nconst connectDatabase = require('./config/db');\n\nconst app = express();\nconnectDatabase();\n\napp.use(express.json());\napp.use('/api/v1/auth', require('./routes/auth.routes'));\n\nconst PORT = process.env.PORT || 5000;\napp.listen(PORT, () => console.log(\`Server is running on port \${PORT}\`));`
-      }
-    ];
-
-    const fileTree = document.getElementById("fileTree");
-    const defaultScreen = document.getElementById("defaultScreen");
-    const editorContent = document.getElementById("editorContent");
-    const editorIcon = document.getElementById("editorIcon");
-    const editorTitle = document.getElementById("editorTitle");
-    const editorPath = document.getElementById("editorPath");
-    const editorEducative = document.getElementById("editorEducative");
-    const editorVibe = document.getElementById("editorVibe");
-    const codeViewer = document.getElementById("codeViewer");
-    const tabBar = document.getElementById("tabBar");
-    const terminalOutput = document.getElementById("terminalOutput");
-
-    function initTree() {
-      structureData.forEach((item, index) => {
-        const btn = document.createElement("button");
-        btn.className = `w-full text-left flex items-center space-x-2 py-1.5 px-4 transition-all duration-150 hover:bg-[#2a2d2e] focus:outline-none text-[#cccccc]`;
-        btn.dataset.index = index;
-
-        const labelColor = item.type === "folder" ? "text-[#e5c07b]" : "text-[#abb2bf]";
-        const prefix = item.type === "folder" ? "📁 " : "📄 ";
-
-        btn.innerHTML = `
-          <span class="text-xs select-none w-4">${prefix}</span>
-          <span class="text-[13px] code-font ${labelColor}">${item.name}${item.type === 'folder' ? '/' : ''}</span>
-        `;
-
-        btn.addEventListener("click", () => handleSelection(btn, item));
-        fileTree.appendChild(btn);
-      });
-    }
-
-    function handleSelection(treeElement, data) {
-      Array.from(fileTree.children).forEach(child => child.classList.remove("bg-[#37373d]", "text-white"));
-      treeElement.classList.add("bg-[#37373d]", "text-white");
-
-      updateEditorTabs(data);
-
-      defaultScreen.classList.add("hidden");
-      editorContent.classList.remove("hidden");
-
-      editorIcon.innerText = data.icon;
-      editorTitle.innerText = data.title;
-      editorPath.innerText = data.path;
-      editorEducative.innerText = data.educative;
-      editorVibe.innerText = `"${data.vibe}"`;
-      
-      // Simple HTML escape for safe output rendering
-      codeViewer.textContent = data.code;
-
-      simulateTerminalAction(data);
-    }
-
-    function updateEditorTabs(data) {
-      tabBar.innerHTML = "";
-      const tab = document.createElement("div");
-      tab.className = "bg-[#1e1e1e] text-white px-4 border-t-2 border-blue-500 flex items-center space-x-2 h-full text-xs font-semibold select-none border-r border-[#252526]";
-      tab.innerHTML = `
-        <span>${data.icon}</span>
-        <span>${data.name}</span>
-        <span class="hover:bg-gray-700 px-1 rounded cursor-pointer text-[10px]">✕</span>
-      `;
-      tabBar.appendChild(tab);
-    }
-
-    function simulateTerminalAction(data) {
-      const line = document.createElement("div");
-      line.className = "text-yellow-400 font-light mt-1 border-l-2 border-yellow-500 pl-2";
-      line.innerHTML = `→ Loaded node: <span class="text-white">${data.path}</span> - Dynamic module initialized successfully.`;
-      terminalOutput.appendChild(line);
-      terminalOutput.scrollTop = terminalOutput.scrollHeight;
-    }
-
-    initTree();
-  </script>
+  <script src="app.js"></script>
 </body>
 </html>
