@@ -137,62 +137,89 @@ const structureData = [
   }
 ];
 
-// Reference DOM elements
+// DOM references
 const fileTree = document.getElementById("fileTree");
-const defaultPrompt = document.getElementById("defaultPrompt");
-const activeContent = document.getElementById("activeContent");
-const activePath = document.getElementById("activePath");
-const activeIcon = document.getElementById("activeIcon");
-const activeTitle = document.getElementById("activeTitle");
-const activeEducative = document.getElementById("activeEducative");
-const activeVibe = document.getElementById("activeVibe");
+const defaultScreen = document.getElementById("defaultScreen");
+const editorContent = document.getElementById("editorContent");
+const editorIcon = document.getElementById("editorIcon");
+const editorTitle = document.getElementById("editorTitle");
+const editorPath = document.getElementById("editorPath");
+const editorEducative = document.getElementById("editorEducative");
+const editorVibe = document.getElementById("editorVibe");
+const tabBar = document.getElementById("tabBar");
+const terminalOutput = document.getElementById("terminalOutput");
 
-// Render Sidebar Explorer
-function renderTree() {
+// State tracker
+let activeTabElement = null;
+
+// Populate Tree sidebar
+function initTree() {
   structureData.forEach((item, index) => {
-    const itemEl = document.createElement("button");
-    itemEl.className = `w-full text-left flex items-center space-x-2.5 px-3 py-2 rounded-md transition-colors text-sm hover:bg-[#21262d] focus:outline-none focus:ring-1 focus:ring-blue-500`;
-    itemEl.dataset.index = index;
-    
-    // Style folders differently from files for visual hierarchy
-    const labelColor = item.type === "folder" ? "text-blue-300 font-medium" : "text-gray-300";
-    
-    itemEl.innerHTML = `
-      <span class="text-base">${item.icon}</span>
-      <span class="${labelColor}">${item.name}${item.type === 'folder' ? '/' : ''}</span>
+    const btn = document.createElement("button");
+    // Classy VS Code styling: indentation, hover state, and icon support
+    btn.className = `w-full text-left flex items-center space-x-2 py-1 px-4 transition-colors hover:bg-[#2a2d2e] focus:outline-none text-[#cccccc]`;
+    btn.dataset.index = index;
+
+    const labelColor = item.type === "folder" ? "text-[#e5c07b]" : "text-[#abb2bf]";
+    const prefix = item.type === "folder" ? "📁 " : "📄 ";
+
+    btn.innerHTML = `
+      <span class="text-xs select-none w-4">${prefix}</span>
+      <span class="text-[13px] ${labelColor}">${item.name}${item.type === 'folder' ? '/' : ''}</span>
     `;
 
-    itemEl.addEventListener("click", () => handleSelect(itemEl, item));
-    fileTree.appendChild(itemEl);
+    btn.addEventListener("click", () => handleSelection(btn, item));
+    fileTree.appendChild(btn);
   });
 }
 
-// Handle Sidebar Item Selection
-function handleSelect(element, item) {
-  // Clear active styling on all explorer elements
-  Array.from(fileTree.children).forEach(child => {
-    child.classList.remove("bg-[#21262d]", "border-l-2", "border-blue-500", "pl-[10px]");
-  });
+// Handle Select Action
+function handleSelection(treeElement, data) {
+  // Clear highlighted state in sidebar
+  Array.from(fileTree.children).forEach(child => child.classList.remove("bg-[#37373d]", "text-white"));
 
-  // Apply active styling to the clicked element
-  element.classList.add("bg-[#21262d]", "border-l-2", "border-blue-500", "pl-[10px]");
+  // Highlight selected tree node
+  treeElement.classList.add("bg-[#37373d]", "text-white");
 
-  // Update Dynamic Panel Content with fade effect
-  activeContent.classList.add("opacity-0");
-  
-  setTimeout(() => {
-    defaultPrompt.classList.add("hidden");
-    activeContent.classList.remove("hidden");
-    
-    activePath.innerText = item.path;
-    activeIcon.innerText = item.icon;
-    activeTitle.innerText = item.title;
-    activeEducative.innerText = item.educative;
-    activeVibe.innerText = item.vibe;
+  // Manage tabs
+  updateEditorTabs(data);
 
-    activeContent.classList.remove("opacity-0");
-  }, 150);
+  // Transition Content
+  defaultScreen.classList.add("hidden");
+  editorContent.classList.remove("hidden");
+
+  editorIcon.innerText = data.icon;
+  editorTitle.innerText = data.title;
+  editorPath.innerText = data.path;
+  editorEducative.innerText = data.educative;
+  editorVibe.innerText = `"${data.vibe}"`;
+
+  // Print corresponding terminal event logs
+  simulateTerminalAction(data);
 }
 
-// Initialize on page load
-renderTree();
+// Keep VS Code styled tabs clean at the top
+function updateEditorTabs(data) {
+  tabBar.innerHTML = ""; // Reset tabs
+
+  const tab = document.createElement("div");
+  tab.className = "bg-[#1e1e1e] text-white px-4 border-t-2 border-blue-500 flex items-center space-x-2 h-full text-xs font-semibold select-none border-r border-[#252526]";
+  tab.innerHTML = `
+    <span>${data.icon}</span>
+    <span>${data.name}</span>
+    <span class="hover:bg-gray-700 px-1 rounded cursor-pointer text-[10px]">✕</span>
+  `;
+  tabBar.appendChild(tab);
+}
+
+// Interactive Terminal Logger
+function simulateTerminalAction(data) {
+  const line = document.createElement("div");
+  line.className = "text-yellow-400 font-light mt-1 border-l-2 border-yellow-500 pl-2 animate-fade-in";
+  line.innerHTML = `→ Inspecting node: <span class="text-white">${data.path}</span> - Dynamic module initialized successfully.`;
+  terminalOutput.appendChild(line);
+  terminalOutput.scrollTop = terminalOutput.scrollHeight;
+}
+
+// Boot up app
+initTree();
