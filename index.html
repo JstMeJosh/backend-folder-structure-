@@ -1,169 +1,722 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Developer Sandbox — Backend Architecture Explorer</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    body {
-      font-family: 'Inter', sans-serif;
-    }
-    .code-font {
-      font-family: 'Fira Code', monospace;
-    }
-    /* Custom scrollbars for realistic IDE scroll */
-    ::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #1e1e1e;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #37373d;
-      border-radius: 4px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #4f4f56;
-    }
-  </style>
-</head>
-<body class="bg-[#1e1e1e] text-[#cccccc] h-full flex flex-col overflow-hidden select-none">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Backend anatomy — architecture explorer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --ink:#0d1b2a;
+    --ink-2:#132a40;
+    --panel:#0f2236;
+    --line:#1c3a54;
+    --line-soft:#16293d;
+    --paper:#eef4f8;
+    --paper-dim:#a9bccb;
+    --amber:#f2a544;
+    --amber-dim:#8a6329;
+    --teal:#4fd1c5;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--ink);
+    background-image:
+      linear-gradient(var(--line-soft) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+    background-size:28px 28px;
+    color:var(--paper);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+  }
+  code, .mono{ font-family:'IBM Plex Mono', monospace; }
+  h1,h2,h3{ font-family:'Space Grotesk', sans-serif; margin:0; }
 
-  <header class="bg-[#3c3c3c] text-[#cccccc] text-xs h-9 flex items-center justify-between px-3 border-b border-[#252526] shrink-0">
-    <div class="flex items-center space-x-4">
-      <span class="text-blue-500 font-bold text-sm">⚡</span>
-      <div class="hidden md:flex space-x-3 text-gray-300">
-        <span class="hover:bg-[#505050] px-2 py-0.5 rounded cursor-pointer">File</span>
-        <span class="hover:bg-[#505050] px-2 py-0.5 rounded cursor-pointer">Edit</span>
-        <span class="hover:bg-[#505050] px-2 py-0.5 rounded cursor-pointer">Selection</span>
-        <span class="hover:bg-[#505050] px-2 py-0.5 rounded cursor-pointer">View</span>
+  .app{ max-width:1280px; margin:0 auto; padding:20px clamp(16px,4vw,40px) 60px; }
+
+  .masthead{
+    display:flex; align-items:baseline; justify-content:space-between; gap:16px;
+    padding-bottom:20px; margin-bottom:24px; border-bottom:1px solid var(--line);
+    flex-wrap:wrap;
+  }
+  .masthead .brand{ display:flex; align-items:center; gap:12px; }
+  .brand .mark{
+    width:34px; height:34px; border:1px solid var(--amber); border-radius:50%;
+    display:flex; align-items:center; justify-content:center; color:var(--amber);
+    font-family:'IBM Plex Mono',monospace; font-size:13px; flex-shrink:0;
+  }
+  .brand h1{ font-size:clamp(18px,2.4vw,22px); font-weight:600; letter-spacing:0.01em; }
+  .brand .sub{ color:var(--paper-dim); font-size:12.5px; margin-top:2px; }
+  .masthead .tag{
+    font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--amber);
+    border:1px solid var(--amber-dim); padding:5px 10px; border-radius:20px;
+    white-space:nowrap;
+  }
+
+  .layout{ display:grid; grid-template-columns: 300px 1fr; gap:20px; align-items:start; }
+  @media (max-width: 880px){ .layout{ grid-template-columns: 1fr; } }
+
+  /* ---- Module rail ---- */
+  .rail{
+    background:var(--panel); border:1px solid var(--line); border-radius:14px;
+    padding:14px; position:sticky; top:20px;
+  }
+  @media (max-width: 880px){ .rail{ position:static; } }
+  .rail-label{
+    font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.08em;
+    color:var(--paper-dim); text-transform:uppercase; padding:0 6px 10px;
+  }
+  .rail-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:2px; }
+  @media (max-width: 880px){
+    .rail-list{ flex-direction:row; overflow-x:auto; gap:8px; padding-bottom:4px; scrollbar-width:thin; }
+  }
+  .rail-item button{
+    all:unset; cursor:pointer; display:flex; align-items:center; gap:10px;
+    width:100%; padding:9px 10px; border-radius:9px; color:var(--paper-dim);
+    font-size:13.5px; transition:background .15s ease, color .15s ease;
+  }
+  @media (max-width: 880px){
+    .rail-item{ flex-shrink:0; }
+    .rail-item button{ width:max-content; white-space:nowrap; padding:8px 12px; border:1px solid var(--line); }
+  }
+  .rail-item button:hover{ background:var(--ink-2); color:var(--paper); }
+  .rail-item button:focus-visible{ outline:2px solid var(--teal); outline-offset:2px; }
+  .rail-item.active button{ background:var(--ink-2); color:var(--paper); }
+  .rail-item.active button .icon{ color:var(--amber); }
+  .rail-item .icon{ width:18px; text-align:center; font-size:14px; color:var(--paper-dim); flex-shrink:0; }
+  .rail-item .kind{
+    margin-left:auto; font-family:'IBM Plex Mono',monospace; font-size:9.5px;
+    color:var(--paper-dim); opacity:.6; flex-shrink:0;
+  }
+
+  /* ---- Detail panel ---- */
+  .panel{ display:flex; flex-direction:column; gap:16px; min-width:0; }
+
+  .empty{
+    background:var(--panel); border:1px solid var(--line); border-radius:14px;
+    padding:60px 24px; text-align:center; color:var(--paper-dim);
+  }
+  .empty .glyph{ font-size:30px; margin-bottom:14px; color:var(--amber); font-family:'IBM Plex Mono',monospace; }
+  .empty p{ max-width:360px; margin:8px auto 0; font-size:13.5px; line-height:1.6; }
+
+  .card{
+    background:var(--panel); border:1px solid var(--line); border-radius:14px; overflow:hidden;
+  }
+  .card-head{
+    display:flex; align-items:center; gap:12px; padding:18px 20px; border-bottom:1px solid var(--line);
+    flex-wrap:wrap;
+  }
+  .card-head .badge{
+    width:38px; height:38px; border-radius:10px; background:var(--ink-2);
+    display:flex; align-items:center; justify-content:center; font-size:15px; color:var(--amber);
+    font-family:'IBM Plex Mono',monospace; flex-shrink:0;
+  }
+  .card-head h2{ font-size:18px; font-weight:600; }
+  .card-head .path{ font-size:12px; color:var(--teal); font-family:'IBM Plex Mono',monospace; margin-top:2px; }
+
+  .notes{ display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--line); }
+  @media (max-width:640px){ .notes{ grid-template-columns:1fr; } }
+  .note{ background:var(--panel); padding:16px 20px; }
+  .note h3{
+    font-size:11px; text-transform:uppercase; letter-spacing:0.07em; color:var(--paper-dim);
+    font-family:'IBM Plex Mono',monospace; margin-bottom:8px;
+  }
+  .note p{ font-size:13.5px; line-height:1.65; color:var(--paper); margin:0; }
+  .note.role h3{ color:var(--amber); }
+  .note.integration h3{ color:var(--teal); }
+
+  .code-block{ border-top:1px solid var(--line); }
+  .code-block .code-head{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:10px 20px; font-family:'IBM Plex Mono',monospace; font-size:11px;
+    color:var(--paper-dim); background:var(--ink-2);
+  }
+  .code-block pre{
+    margin:0; padding:18px 20px; overflow-x:auto; font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px; line-height:1.7; color:#c9e6da; background:#0a1620;
+  }
+
+  .log{
+    background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:14px 18px;
+    font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--paper-dim);
+    max-height:130px; overflow-y:auto;
+  }
+  .log .line{ padding:2px 0; }
+  .log .line .path{ color:var(--teal); }
+  .log-head{
+    display:flex; justify-content:space-between; font-size:10.5px; text-transform:uppercase;
+    letter-spacing:.07em; color:var(--paper-dim); opacity:.7; margin-bottom:8px;
+  }
+
+  /* ---- Intro ---- */
+  .intro{ padding:22px 0 26px; border-bottom:1px solid var(--line); margin-bottom:24px; max-width:760px; }
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.09em; text-transform:uppercase;
+    color:var(--teal); margin:0 0 8px;
+  }
+  .intro h2{ font-size:clamp(20px,3vw,26px); font-weight:600; line-height:1.25; margin-bottom:12px; }
+  .intro p:not(.eyebrow){ font-size:14.5px; line-height:1.7; color:var(--paper-dim); margin:0; }
+
+  /* ---- Simulator ---- */
+  .sim{ margin-bottom:24px; }
+  .sim-body{ padding:18px 20px 22px; }
+  .sim-copy{ font-size:13px; color:var(--paper-dim); line-height:1.6; margin:0 0 16px; }
+  .sim-copy code{ color:var(--teal); }
+  .sim-controls{ display:flex; align-items:center; gap:14px; margin-bottom:16px; }
+  .run-btn{
+    all:unset; cursor:pointer; background:var(--amber); color:#2a1a04; font-weight:600;
+    font-size:13px; padding:9px 18px; border-radius:9px; transition:opacity .15s ease;
+  }
+  .run-btn:hover{ opacity:.88; }
+  .run-btn:disabled{ opacity:.5; cursor:default; }
+  .run-btn:focus-visible{ outline:2px solid var(--teal); outline-offset:2px; }
+  .sim-status{ font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--paper-dim); }
+
+  .sim-trace{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:0; }
+  .sim-trace li{
+    display:flex; align-items:flex-start; gap:12px; padding:10px 0; border-bottom:1px solid var(--line-soft);
+    opacity:0; transform:translateY(4px); transition:opacity .25s ease, transform .25s ease;
+  }
+  .sim-trace li.shown{ opacity:1; transform:translateY(0); }
+  .sim-trace li:last-child{ border-bottom:none; }
+  .sim-trace .step-icon{
+    width:26px; height:26px; border-radius:7px; background:var(--ink-2); flex-shrink:0;
+    display:flex; align-items:center; justify-content:center; font-size:12px; color:var(--amber);
+    font-family:'IBM Plex Mono',monospace;
+  }
+  .sim-trace .step-body .step-file{
+    font-family:'IBM Plex Mono',monospace; font-size:12.5px; color:var(--teal); margin-bottom:2px;
+  }
+  .sim-trace .step-body .step-desc{ font-size:13px; color:var(--paper); line-height:1.5; }
+
+  .sim-response{
+    margin-top:16px; background:var(--ink-2); border:1px solid var(--line); border-radius:10px;
+    padding:14px 16px; font-family:'IBM Plex Mono',monospace; font-size:12px; color:#c9e6da;
+    white-space:pre-wrap;
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header class="masthead">
+    <div class="brand">
+      <div class="mark">⚙</div>
+      <div>
+        <h1>Backend anatomy</h1>
+        <div class="sub">A guided dissection of a Node.js API service</div>
       </div>
     </div>
-    <div class="text-[11px] text-[#858585] bg-[#2d2d2d] px-8 sm:px-16 py-1 rounded border border-[#454545] truncate max-w-[180px] sm:max-w-md">
-      server.js — backend-anatomy
-    </div>
-    <div class="flex space-x-2">
-      <div class="w-3 h-3 rounded-full bg-[#ff5f56]"></div>
-      <div class="w-3 h-3 rounded-full bg-[#ffbd2e]"></div>
-      <div class="w-3 h-3 rounded-full bg-[#27c93f]"></div>
-    </div>
+    <span class="tag">18 modules · Express + MongoDB</span>
   </header>
 
-  <div class="flex-1 flex flex-col md:flex-row overflow-hidden">
-    
-    <nav class="hidden md:flex w-12 bg-[#333333] flex-col justify-between items-center py-2 border-r border-[#252526] shrink-0">
-      <div class="flex flex-col space-y-4 w-full items-center">
-        <button class="w-full py-2 border-l-2 border-blue-500 text-white focus:outline-none" title="Explorer">📁</button>
-        <button class="w-full py-2 text-gray-500 hover:text-gray-300 focus:outline-none" title="Search">🔍</button>
-        <button class="w-full py-2 text-gray-500 hover:text-gray-300 focus:outline-none" title="Extensions">🧩</button>
+  <section class="intro">
+    <p class="eyebrow">What this is</p>
+    <h2>Learn a backend by walking through a real one</h2>
+    <p>
+      This is a working reference project — a small user-registration API built with Express and
+      MongoDB, laid out the way a production service actually gets organised: routes, middleware,
+      validation, controllers, services and models, each with one job. Click any file in the tree
+      to read what it does and why it lives where it does. Then use the request simulator below to
+      watch a real request travel through every one of those layers, in order, the same path it
+      would take on an actual server.
+    </p>
+  </section>
+
+  <section class="sim card" id="simCard">
+    <div class="card-head">
+      <div class="badge">▶</div>
+      <div>
+        <h2>Live request simulator</h2>
+        <div class="path">POST /api/v1/auth/register</div>
       </div>
-      <div class="text-gray-500 text-sm hover:text-white cursor-pointer" title="Settings">⚙️</div>
+    </div>
+    <div class="sim-body">
+      <p class="sim-copy">
+        This replays the real flow of <code>server.js</code> handling a signup request — no server
+        is actually running, but every step below matches the code you can inspect in the tree.
+      </p>
+      <div class="sim-controls">
+        <button type="button" id="runSim" class="run-btn">Run simulation</button>
+        <span class="sim-status" id="simStatus">Ready</span>
+      </div>
+      <ol class="sim-trace" id="simTrace"></ol>
+      <div class="sim-response" id="simResponse" hidden></div>
+    </div>
+  </section>
+
+  <div class="layout">
+    <nav class="rail" aria-label="Project modules">
+      <div class="rail-label">Project tree</div>
+      <ul class="rail-list" id="railList"></ul>
     </nav>
 
-    <aside class="w-full md:w-64 bg-[#252526] border-b md:border-b-0 md:border-r border-[#1e1e1e] flex flex-col shrink-0">
-      <div class="px-5 py-2.5 flex justify-between items-center border-b border-[#1e1e1e]">
-        <span class="text-[11px] font-bold tracking-wider uppercase text-[#bbbbbb]">Explorer</span>
-        <span class="text-xs text-gray-500">Workspace</span>
-      </div>
-      
-      <div class="px-4 py-1.5 bg-[#2d2d2d] flex items-center text-[11px] font-bold tracking-wide text-gray-300 uppercase">
-        <span class="mr-1.5 text-blue-400">▼</span> BACKEND-ANATOMY
-      </div>
-      
-      <div class="max-h-40 md:max-h-none flex-1 overflow-y-auto px-1 py-2 space-y-0.5 text-sm" id="fileTree"></div>
-    </aside>
-
-    <section class="flex-1 flex flex-col bg-[#1e1e1e] overflow-hidden">
-      
-      <div class="bg-[#2d2d2d] h-9 flex border-b border-[#1e1e1e] overflow-x-auto shrink-0" id="tabBar">
-        <div class="bg-[#1e1e1e] text-white px-4 flex items-center space-x-2 border-r border-[#1e1e1e] h-full text-xs cursor-pointer">
-          <span>🏠 README.md</span>
-        </div>
-      </div>
-
-      <div class="flex-1 flex flex-col lg:flex-row overflow-hidden" id="editorWindow">
-        
-        <div id="defaultScreen" class="flex-1 flex flex-col items-center justify-center text-center p-6 space-y-4">
-          <div class="text-6xl animate-pulse">📂</div>
-          <h2 class="text-xl font-semibold text-white">Interactive Backend Architecture</h2>
-          <p class="text-xs text-[#858585] max-w-sm leading-relaxed">
-            Select any file or folder from the explorer to preview production code syntax and read architectural deployment details.
-          </p>
-        </div>
-
-        <div id="editorContent" class="hidden flex-1 flex flex-col lg:flex-row overflow-hidden">
-          
-          <div class="flex-1 border-b lg:border-b-0 lg:border-r border-[#2b2b2b] flex flex-col overflow-hidden bg-[#181818]">
-            <div class="bg-[#202020] px-4 py-1.5 border-b border-[#2b2b2b] text-[11px] text-[#858585] font-bold tracking-wider flex justify-between items-center">
-              <span>📝 IMPLEMENTATION PREVIEW</span>
-              <span class="text-blue-400">javascript</span>
-            </div>
-            <pre class="flex-1 p-4 overflow-auto code-font text-[13px] leading-relaxed text-[#a3b899]"><code id="codeViewer" class="block"></code></pre>
-          </div>
-
-          <div class="w-full lg:w-[400px] flex flex-col overflow-y-auto bg-[#1e1e1e] p-6 space-y-6 shrink-0">
-            <div class="flex items-center space-x-3">
-              <span id="editorIcon" class="text-3xl"></span>
-              <div>
-                <h1 id="editorTitle" class="text-xl font-bold text-white tracking-tight code-font"></h1>
-                <p class="text-xs text-[#858585] code-font">Path: <span id="editorPath" class="text-[#4fc1ff]"></span></p>
-              </div>
-            </div>
-
-            <hr class="border-[#2b2b2b]" />
-
-            <div class="bg-[#252526] border border-[#3c3c3c] rounded p-4 relative overflow-hidden">
-              <div class="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
-              <h3 class="text-xs font-bold text-blue-400 tracking-wider uppercase mb-2">🎓 Functional Purpose</h3>
-              <p id="editorEducative" class="text-xs text-[#cccccc] leading-relaxed"></p>
-            </div>
-
-            <div class="bg-[#1a2333] border border-[#2b3a54] rounded p-4 relative">
-              <div class="absolute top-0 left-0 w-1 h-full bg-blue-400"></div>
-              <h3 class="text-xs font-bold text-blue-300 tracking-wider uppercase mb-2">ℹ️ System Integration Note</h3>
-              <p id="editorVibe" class="text-xs text-[#b8c5db] leading-relaxed"></p>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-      <footer class="h-32 sm:h-40 bg-[#1e1e1e] border-t border-[#2b2b2b] flex flex-col shrink-0">
-        <div class="bg-[#252526] h-8 flex items-center justify-between px-4 text-xs border-b border-[#2d2d2d]">
-          <div class="flex space-x-4">
-            <span class="text-white border-b-2 border-blue-500 pb-1.5 font-semibold cursor-pointer">TERMINAL</span>
-            <span class="text-gray-400 hover:text-white cursor-pointer">PROBLEMS</span>
-          </div>
-          <div class="text-gray-500">node v20.11.0</div>
-        </div>
-        <div class="flex-1 p-3 overflow-y-auto code-font text-[11px] text-[#858585] space-y-1 bg-[#151515]" id="terminalOutput">
-          <div><span class="text-green-500">user@unilag-dev:~/workspace/backend-anatomy$</span> npm run dev</div>
-          <div class="text-gray-500">[nodemon] starting `node server.js`</div>
-          <div class="text-[#c9d1d9]">⚡ Server active. Listening on Port 5000...</div>
-          <div class="text-blue-500">📂 Database connection stream active</div>
-        </div>
-      </footer>
-
-    </section>
+    <main class="panel">
+      <div id="detail"></div>
+      <section class="log">
+        <div class="log-head"><span>Activity log</span><span id="logCount">0 events</span></div>
+        <div id="logBody"></div>
+      </section>
+    </main>
   </div>
+</div>
 
-  <footer class="bg-[#007acc] text-white text-[11px] h-6 flex items-center justify-between px-3 shrink-0">
-    <div class="flex items-center space-x-3">
-      <span class="bg-[#1f8ad2] px-2 py-0.5 font-bold">✓ Master</span>
-      <span>0 ⚠</span>
-      <span>0 ⊗</span>
-    </div>
-    <div class="flex items-center space-x-4">
-      <span>UTF-8</span>
-      <span>JavaScript</span>
-    </div>
-  </footer>
+<script type="module">
+/**
+ * Data module — describes each file/folder in the sample backend.
+ */
+const structure = [
+  {
+    name: "config", type: "folder", icon: "⚙", path: "config/",
+    role: "Houses configuration setup: database connections, environment loaders, and third-party client initialisation. Centralising this here keeps environment changes to a single file.",
+    integration: "Imported once by the entry point to establish the connection to external resources before the server starts accepting traffic.",
+    code: `// config/db.js
+import mongoose from 'mongoose';
 
-  <script src="app.js"></script>
+export const connectDatabase = async () => {
+  try {
+    const conn = await mongoose.connect(process.env.MONGO_URI);
+    console.log(\`MongoDB connected: \${conn.connection.host}\`);
+  } catch (error) {
+    console.error(\`Database connection failed: \${error.message}\`);
+    process.exit(1);
+  }
+};`
+  },
+  {
+    name: "constants", type: "folder", icon: "❄", path: "constants/",
+    role: "Maintains read-only values such as user roles, HTTP status codes, and error labels. Exporting them as constants keeps autocomplete useful and prevents silent typos.",
+    integration: "Referenced anywhere a status code or permission check is needed, so behaviour stays consistent across controllers.",
+    code: `// constants/roles.js
+export const USER_ROLES = {
+  ADMIN: 'ADMIN',
+  USER: 'USER',
+  GUEST: 'GUEST'
+};
+
+export const STATUS_CODES = {
+  OK: 200,
+  CREATED: 201,
+  BAD_REQUEST: 400,
+  UNAUTHORIZED: 401,
+  INTERNAL_ERROR: 500
+};`
+  },
+  {
+    name: "routes", type: "folder", icon: "↝", path: "routes/",
+    role: "Maps incoming URLs and HTTP verbs to controller functions. Each route module groups a related set of endpoints.",
+    integration: "The gateway layer: it wires middleware and validation onto an endpoint before handing off to the controller.",
+    code: `// routes/auth.routes.js
+import { Router } from 'express';
+import { loginUser, registerUser } from '../controllers/authController.js';
+import { validateSchema } from '../validation/validate.js';
+import { userSchema } from '../validation/schemas/userSchema.js';
+
+const router = Router();
+
+router.post('/register', validateSchema(userSchema), registerUser);
+router.post('/login', loginUser);
+
+export default router;`
+  },
+  {
+    name: "middleware", type: "folder", icon: "▣", path: "middleware/",
+    role: "Intercepts the request cycle to handle concerns like authentication, logging, or payload limits before a request reaches its controller.",
+    integration: "Rejects invalid requests early, so controllers only ever run against requests that have already passed the gate.",
+    code: `// middleware/auth.js
+import jwt from 'jsonwebtoken';
+
+export const protect = (req, res, next) => {
+  const token = req.headers.authorization?.split(' ')[1];
+  if (!token) {
+    return res.status(401).json({ error: 'Access denied. No token provided.' });
+  }
+  try {
+    req.user = jwt.verify(token, process.env.JWT_SECRET);
+    next();
+  } catch (error) {
+    res.status(401).json({ error: 'Invalid token.' });
+  }
+};`
+  },
+  {
+    name: "validation", type: "folder", icon: "✓", path: "validation/",
+    role: "Defines schema-based checks (with a library like Zod) that a request body must pass before processing continues.",
+    integration: "Sits ahead of the controller in the middleware chain, so malformed payloads never reach business logic.",
+    code: `// validation/validate.js
+export const validateSchema = (schema) => (req, res, next) => {
+  const result = schema.safeParse(req.body);
+  if (!result.success) {
+    return res.status(400).json({
+      errors: result.error.errors.map((err) => err.message)
+    });
+  }
+  next();
+};`
+  },
+  {
+    name: "controllers", type: "folder", icon: "◎", path: "controllers/",
+    role: "Coordinates a single client interaction: reads the request, calls the relevant service, and shapes the response.",
+    integration: "The thin bridge layer — it never talks to the database directly, keeping request handling separate from business logic.",
+    code: `// controllers/authController.js
+import { registerNewUser } from '../services/userService.js';
+
+export const registerUser = async (req, res) => {
+  try {
+    const user = await registerNewUser(req.body);
+    res.status(201).json({ success: true, data: user });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};`
+  },
+  {
+    name: "services", type: "folder", icon: "◆", path: "services/",
+    role: "Holds business logic and third-party integrations, like payment processing or sending email. Keeping this separate keeps controllers thin and testable.",
+    integration: "Reusable across multiple controllers, and free of any HTTP-specific concerns like req or res.",
+    code: `// services/userService.js
+import bcrypt from 'bcrypt';
+import User from '../models/User.js';
+
+export const registerNewUser = async (userData) => {
+  const hashedPassword = await bcrypt.hash(userData.password, 10);
+  return User.create({
+    username: userData.username,
+    email: userData.email,
+    password: hashedPassword
+  });
+};`
+  },
+  {
+    name: "models", type: "folder", icon: "▤", path: "models/",
+    role: "Defines the database schema using an ODM like Mongoose. Declaring structure here enforces what fields can be created or updated.",
+    integration: "The single source of truth for shape — every write action is validated against the schema defined here.",
+    code: `// models/User.js
+import mongoose from 'mongoose';
+
+const UserSchema = new mongoose.Schema({
+  username: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true }
+}, { timestamps: true });
+
+export default mongoose.model('User', UserSchema);`
+  },
+  {
+    name: "templates", type: "folder", icon: "▧", path: "templates/",
+    role: "Stores rendering layouts, like HTML emails or invoice markup. Dynamic data is merged in before the template is sent out.",
+    integration: "Keeps presentation markup separate from the logic that generates its data.",
+    code: `<div style="font-family: Arial, sans-serif; padding: 20px;">
+  <h1>Welcome back, {{username}}!</h1>
+  <p>Your account has been successfully verified.</p>
+  <a href="{{url}}">Go to dashboard</a>
+</div>`
+  },
+  {
+    name: "package.json", type: "file", icon: "▦", path: "package.json",
+    role: "The project manifest: metadata, scripts, and the list of dependencies the app needs to run.",
+    integration: "Read by npm install to build out the local dependency tree.",
+    code: `{
+  "name": "backend-anatomy",
+  "version": "1.0.0",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "express": "^4.19.2",
+    "mongoose": "^8.2.1",
+    "zod": "^3.22.4"
+  }
+}`
+  },
+  {
+    name: "package-lock.json", type: "file", icon: "⛓", path: "package-lock.json",
+    role: "Locks the exact dependency tree, including sub-dependencies, so installs stay identical across machines.",
+    integration: "Generated and updated automatically — this file should never be hand-edited.",
+    code: `{
+  "name": "backend-anatomy",
+  "version": "1.0.0",
+  "lockfileVersion": 3,
+  "requires": true,
+  "packages": {
+    "": {
+      "name": "backend-anatomy",
+      "dependencies": { "express": "^4.19.2" }
+    }
+  }
+}`
+  },
+  {
+    name: "node_modules", type: "folder", icon: "▩", path: "node_modules/",
+    role: "Holds every installed dependency, including nested sub-dependencies. This folder can grow large quickly.",
+    integration: "Runs locally only and is never committed to version control.",
+    code: `// node_modules/ (generated, not tracked)
+// ├─ express/
+// ├─ mongoose/
+// ├─ bcrypt/
+// └─ ...hundreds of nested packages`
+  },
+  {
+    name: ".env", type: "file", icon: "⚿", path: ".env",
+    role: "Stores environment-specific secrets: database credentials, API keys, and tokens, kept out of source control.",
+    integration: "Loaded at startup and never checked in — treat every value here as sensitive.",
+    code: `PORT=5000
+MONGO_URI="mongodb+srv://user:password@cluster0.mongodb.net/app_db"
+JWT_SECRET="replace-with-a-strong-random-secret"
+STRIPE_SECRET_KEY="sk_test_..."`
+  },
+  {
+    name: ".gitignore", type: "file", icon: "◫", path: ".gitignore",
+    role: "Tells Git which files and folders to skip tracking, most importantly node_modules and .env.",
+    integration: "The last line of defence against committing local files or credentials by accident.",
+    code: `node_modules/
+.env
+.env.local
+dist/
+build/
+.DS_Store`
+  },
+  {
+    name: "server.js", type: "file", icon: "▶", path: "server.js",
+    role: "The entry point. Loads configuration, connects the database, wires up routes, and starts the HTTP listener.",
+    integration: "The first file Node reads on start — every other module is reachable from here.",
+    code: `// server.js
+import 'dotenv/config';
+import express from 'express';
+import { connectDatabase } from './config/db.js';
+import authRoutes from './routes/auth.routes.js';
+
+const app = express();
+await connectDatabase();
+
+app.use(express.json());
+app.use('/api/v1/auth', authRoutes);
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(\`Server running on port \${PORT}\`));`
+  }
+];
+
+/**
+ * Escapes HTML-sensitive characters in code samples before injecting via innerHTML.
+ */
+const escapeHtml = (str) =>
+  str.replace(/[&<>]/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[ch]));
+
+/**
+ * ActivityLog — small append-only feed rendered into the footer log panel.
+ */
+class ActivityLog {
+  #entries = [];
+  #bodyEl;
+  #countEl;
+
+  constructor(bodyEl, countEl) {
+    this.#bodyEl = bodyEl;
+    this.#countEl = countEl;
+  }
+
+  push(path) {
+    const time = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+    this.#entries.unshift({ path, time });
+    this.#render();
+  }
+
+  #render() {
+    this.#countEl.textContent = `${this.#entries.length} event${this.#entries.length === 1 ? "" : "s"}`;
+    this.#bodyEl.innerHTML = this.#entries
+      .slice(0, 12)
+      .map(({ path, time }) => `<div class="line">[${time}] loaded <span class="path">${path}</span></div>`)
+      .join("");
+  }
+}
+
+/**
+ * ModuleExplorer — owns the rail list and the detail panel, and keeps them in sync.
+ */
+class ModuleExplorer {
+  #items;
+  #railEl;
+  #detailEl;
+  #log;
+  #activeIndex = null;
+
+  constructor({ items, railEl, detailEl, log }) {
+    this.#items = items;
+    this.#railEl = railEl;
+    this.#detailEl = detailEl;
+    this.#log = log;
+  }
+
+  init() {
+    this.#renderRail();
+    this.#renderEmptyState();
+  }
+
+  #renderRail() {
+    this.#railEl.innerHTML = this.#items
+      .map(
+        (item, index) => `
+        <li class="rail-item" data-index="${index}">
+          <button type="button" aria-current="false">
+            <span class="icon">${item.icon}</span>
+            <span>${item.name}${item.type === "folder" ? "/" : ""}</span>
+            <span class="kind">${item.type}</span>
+          </button>
+        </li>`
+      )
+      .join("");
+
+    this.#railEl.querySelectorAll(".rail-item button").forEach((btn, index) => {
+      btn.addEventListener("click", () => this.select(index));
+    });
+  }
+
+  select(index) {
+    const item = this.#items[index];
+    if (!item) return;
+
+    this.#activeIndex = index;
+    this.#railEl.querySelectorAll(".rail-item").forEach((li, i) => {
+      const isActive = i === index;
+      li.classList.toggle("active", isActive);
+      li.querySelector("button")?.setAttribute("aria-current", String(isActive));
+    });
+
+    this.#renderDetail(item);
+    this.#log.push(item.path);
+  }
+
+  #renderEmptyState() {
+    this.#detailEl.innerHTML = `
+      <div class="empty">
+        <div class="glyph">◈</div>
+        <h2>Select a module to inspect it</h2>
+        <p>Pick any file or folder from the tree to see what it's for, how it connects to the rest of the app, and a representative code sample.</p>
+      </div>`;
+  }
+
+  #renderDetail(item) {
+    this.#detailEl.innerHTML = `
+      <div class="card">
+        <div class="card-head">
+          <div class="badge">${item.icon}</div>
+          <div>
+            <h2>${item.name}${item.type === "folder" ? "/" : ""}</h2>
+            <div class="path">${item.path}</div>
+          </div>
+        </div>
+        <div class="notes">
+          <div class="note role">
+            <h3>What it does</h3>
+            <p>${item.role}</p>
+          </div>
+          <div class="note integration">
+            <h3>How it connects</h3>
+            <p>${item.integration}</p>
+          </div>
+        </div>
+        <div class="code-block">
+          <div class="code-head">
+            <span>sample</span>
+            <span>${item.type === "file" ? "javascript / json" : "javascript"}</span>
+          </div>
+          <pre><code>${escapeHtml(item.code)}</code></pre>
+        </div>
+      </div>`;
+  }
+}
+
+/**
+ * RequestSimulator — replays the real request path through the module list,
+ * step by step, ending in a mock response. Nothing here calls a real server.
+ */
+class RequestSimulator {
+  #steps = [
+    { icon: "↝", file: "routes/auth.routes.js", desc: "Request hits the router: POST /register is matched." },
+    { icon: "✓", file: "validation/validate.js", desc: "Payload is checked against the user schema before anything else runs." },
+    { icon: "◎", file: "controllers/authController.js", desc: "registerUser() receives the request and delegates to the service layer." },
+    { icon: "◆", file: "services/userService.js", desc: "registerNewUser() hashes the password with bcrypt." },
+    { icon: "▤", file: "models/User.js", desc: "User.create() writes the new document to MongoDB." },
+    { icon: "◎", file: "controllers/authController.js", desc: "Controller sends a 201 response back to the client." }
+  ];
+
+  #mockResponse = {
+    success: true,
+    data: { id: "665f1a2e9c3d4b0012ab34cd", username: "ada_lovelace", email: "ada@example.com" }
+  };
+
+  constructor({ traceEl, statusEl, responseEl, runBtn, log }) {
+    this.traceEl = traceEl;
+    this.statusEl = statusEl;
+    this.responseEl = responseEl;
+    this.runBtn = runBtn;
+    this.log = log;
+    this.runBtn.addEventListener("click", () => this.run());
+  }
+
+  #wait(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  async run() {
+    this.runBtn.disabled = true;
+    this.responseEl.hidden = true;
+    this.responseEl.textContent = "";
+    this.statusEl.textContent = "Running…";
+    this.traceEl.innerHTML = this.#steps
+      .map(
+        (step) => `
+        <li>
+          <span class="step-icon">${step.icon}</span>
+          <span class="step-body">
+            <div class="step-file">${step.file}</div>
+            <div class="step-desc">${step.desc}</div>
+          </span>
+        </li>`
+      )
+      .join("");
+
+    const items = [...this.traceEl.children];
+    for (const [index, li] of items.entries()) {
+      await this.#wait(index === 0 ? 150 : 420);
+      li.classList.add("shown");
+      this.log.push(this.#steps[index].file);
+    }
+
+    await this.#wait(300);
+    this.statusEl.textContent = "201 Created";
+    this.responseEl.hidden = false;
+    this.responseEl.textContent = JSON.stringify(this.#mockResponse, null, 2);
+    this.runBtn.disabled = false;
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const log = new ActivityLog(document.getElementById("logBody"), document.getElementById("logCount"));
+  const explorer = new ModuleExplorer({
+    items: structure,
+    railEl: document.getElementById("railList"),
+    detailEl: document.getElementById("detail"),
+    log
+  });
+  explorer.init();
+
+  new RequestSimulator({
+    traceEl: document.getElementById("simTrace"),
+    statusEl: document.getElementById("simStatus"),
+    responseEl: document.getElementById("simResponse"),
+    runBtn: document.getElementById("runSim"),
+    log
+  });
+});
+</script>
 </body>
 </html>
