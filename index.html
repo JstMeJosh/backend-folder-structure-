@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Backend anatomy — architecture explorer</title>
+<title>Backend anatomy — learn separation of concerns</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
@@ -19,254 +19,361 @@
     --amber:#f2a544;
     --amber-dim:#8a6329;
     --teal:#4fd1c5;
+    --red:#e2725b;
   }
-  *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;}
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
   body{
-    background:var(--ink);
+    margin:0; background:var(--ink);
     background-image:
       linear-gradient(var(--line-soft) 1px, transparent 1px),
       linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
     background-size:28px 28px;
-    color:var(--paper);
-    font-family:'Inter',sans-serif;
-    min-height:100vh;
+    color:var(--paper); font-family:'Inter',sans-serif; min-height:100vh;
   }
   code, .mono{ font-family:'IBM Plex Mono', monospace; }
   h1,h2,h3{ font-family:'Space Grotesk', sans-serif; margin:0; }
+  a{ color:var(--teal); }
 
-  .app{ max-width:1280px; margin:0 auto; padding:20px clamp(16px,4vw,40px) 60px; }
+  .wrap{ max-width:1180px; margin:0 auto; padding:20px clamp(16px,4vw,40px) 70px; }
 
+  /* ---------- Masthead ---------- */
   .masthead{
-    display:flex; align-items:baseline; justify-content:space-between; gap:16px;
-    padding-bottom:20px; margin-bottom:24px; border-bottom:1px solid var(--line);
-    flex-wrap:wrap;
+    display:flex; align-items:center; justify-content:space-between; gap:16px;
+    padding-bottom:18px; margin-bottom:36px; border-bottom:1px solid var(--line); flex-wrap:wrap;
   }
-  .masthead .brand{ display:flex; align-items:center; gap:12px; }
-  .brand .mark{
+  .brand{ display:flex; align-items:center; gap:12px; }
+  .mark{
     width:34px; height:34px; border:1px solid var(--amber); border-radius:50%;
     display:flex; align-items:center; justify-content:center; color:var(--amber);
     font-family:'IBM Plex Mono',monospace; font-size:13px; flex-shrink:0;
   }
-  .brand h1{ font-size:clamp(18px,2.4vw,22px); font-weight:600; letter-spacing:0.01em; }
-  .brand .sub{ color:var(--paper-dim); font-size:12.5px; margin-top:2px; }
-  .masthead .tag{
-    font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--amber);
-    border:1px solid var(--amber-dim); padding:5px 10px; border-radius:20px;
-    white-space:nowrap;
+  .brand h1{ font-size:clamp(17px,2.2vw,20px); font-weight:600; }
+  .brand .sub{ color:var(--paper-dim); font-size:12px; margin-top:1px; }
+  nav.crumbs{ display:flex; gap:18px; font-size:13px; }
+  nav.crumbs a{ text-decoration:none; color:var(--paper-dim); }
+  nav.crumbs a:hover{ color:var(--paper); }
+  @media (max-width:640px){ nav.crumbs{ width:100%; overflow-x:auto; gap:14px; } }
+
+  /* ---------- Hero / lesson intro ---------- */
+  .hero{ max-width:740px; margin-bottom:44px; }
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.09em; text-transform:uppercase;
+    color:var(--teal); margin:0 0 10px;
   }
+  .hero h2{ font-size:clamp(24px,4vw,34px); line-height:1.2; font-weight:600; margin-bottom:14px; }
+  .hero p{ font-size:15px; line-height:1.75; color:var(--paper-dim); margin:0; }
+  .hero p + p{ margin-top:12px; }
 
-  .layout{ display:grid; grid-template-columns: 300px 1fr; gap:20px; align-items:start; }
-  @media (max-width: 880px){ .layout{ grid-template-columns: 1fr; } }
+  /* ---------- Section shell ---------- */
+  section.block{ margin-bottom:46px; }
+  .block-head{ margin-bottom:18px; max-width:680px; }
+  .block-head .eyebrow{ margin-bottom:6px; }
+  .block-head h3{ font-size:clamp(19px,2.6vw,23px); font-weight:600; margin-bottom:8px; }
+  .block-head p{ font-size:13.5px; color:var(--paper-dim); line-height:1.65; margin:0; }
 
-  /* ---- Module rail ---- */
+  /* ---------- Before / after ---------- */
+  .compare{ display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--line); border:1px solid var(--line); border-radius:14px; overflow:hidden; }
+  @media (max-width:760px){ .compare{ grid-template-columns:1fr; } }
+  .compare .side{ background:var(--panel); padding:16px 18px 20px; }
+  .compare .side-label{
+    display:flex; align-items:center; gap:8px; font-family:'IBM Plex Mono',monospace; font-size:11.5px;
+    text-transform:uppercase; letter-spacing:.06em; margin-bottom:12px;
+  }
+  .compare .side.bad .side-label{ color:var(--red); }
+  .compare .side.good .side-label{ color:var(--teal); }
+  .compare .dot{ width:7px; height:7px; border-radius:50%; background:currentColor; }
+  .compare pre{
+    margin:0; background:#0a1620; border:1px solid var(--line); border-radius:9px;
+    padding:14px 16px; font-size:12px; line-height:1.65; overflow-x:auto; color:#c9e6da;
+  }
+  .compare .side.bad pre{ color:#e8b3a6; }
+  .compare .verdict{ font-size:12.5px; color:var(--paper-dim); line-height:1.6; margin-top:12px; }
+
+  /* ---------- Naming conventions ---------- */
+  .conv-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:12px; }
+  .conv-card{
+    background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:15px 16px;
+  }
+  .conv-card .icon{ font-size:15px; color:var(--amber); font-family:'IBM Plex Mono',monospace; margin-bottom:8px; }
+  .conv-card h4{ font-family:'Space Grotesk',sans-serif; font-size:14.5px; font-weight:600; margin:0 0 6px; }
+  .conv-card .pattern{
+    display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--teal);
+    background:var(--ink-2); border-radius:6px; padding:3px 8px; margin-bottom:8px;
+  }
+  .conv-card p{ font-size:12.5px; color:var(--paper-dim); line-height:1.6; margin:0; }
+
+  /* ---------- Explorer ---------- */
+  .explorer{ display:grid; grid-template-columns:280px 1fr; gap:20px; align-items:start; }
+  @media (max-width:880px){ .explorer{ grid-template-columns:1fr; } }
+
   .rail{
-    background:var(--panel); border:1px solid var(--line); border-radius:14px;
-    padding:14px; position:sticky; top:20px;
+    background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:10px;
+    position:sticky; top:20px;
   }
-  @media (max-width: 880px){ .rail{ position:static; } }
-  .rail-label{
-    font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.08em;
-    color:var(--paper-dim); text-transform:uppercase; padding:0 6px 10px;
+  @media (max-width:880px){ .rail{ position:static; } }
+  .rail-group + .rail-group{ margin-top:6px; }
+  .rail-group-label{
+    font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase;
+    color:var(--paper-dim); opacity:.75; padding:10px 10px 6px;
   }
-  .rail-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:2px; }
-  @media (max-width: 880px){
-    .rail-list{ flex-direction:row; overflow-x:auto; gap:8px; padding-bottom:4px; scrollbar-width:thin; }
+  .rail-list{ list-style:none; margin:0; padding:0; }
+  .rail-list li button{
+    all:unset; box-sizing:border-box; cursor:pointer; display:flex; align-items:center; gap:10px;
+    width:100%; padding:10px 10px; border-radius:9px; color:var(--paper-dim); font-size:13.5px;
+    transition:background .15s ease, color .15s ease;
   }
-  .rail-item button{
-    all:unset; cursor:pointer; display:flex; align-items:center; gap:10px;
-    width:100%; padding:9px 10px; border-radius:9px; color:var(--paper-dim);
-    font-size:13.5px; transition:background .15s ease, color .15s ease;
-  }
-  @media (max-width: 880px){
-    .rail-item{ flex-shrink:0; }
-    .rail-item button{ width:max-content; white-space:nowrap; padding:8px 12px; border:1px solid var(--line); }
-  }
-  .rail-item button:hover{ background:var(--ink-2); color:var(--paper); }
-  .rail-item button:focus-visible{ outline:2px solid var(--teal); outline-offset:2px; }
-  .rail-item.active button{ background:var(--ink-2); color:var(--paper); }
-  .rail-item.active button .icon{ color:var(--amber); }
-  .rail-item .icon{ width:18px; text-align:center; font-size:14px; color:var(--paper-dim); flex-shrink:0; }
-  .rail-item .kind{
-    margin-left:auto; font-family:'IBM Plex Mono',monospace; font-size:9.5px;
-    color:var(--paper-dim); opacity:.6; flex-shrink:0;
+  .rail-list li button:hover{ background:var(--ink-2); color:var(--paper); }
+  .rail-list li button:focus-visible{ outline:2px solid var(--teal); outline-offset:-2px; }
+  .rail-list li.active button{ background:var(--ink-2); color:var(--paper); }
+  .rail-list li.active button .icon{ color:var(--amber); }
+  .rail-list .icon{ width:18px; text-align:center; font-size:13.5px; color:var(--paper-dim); flex-shrink:0; }
+  .rail-list .kind{
+    margin-left:auto; font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:var(--paper-dim); opacity:.55; flex-shrink:0;
   }
 
-  /* ---- Detail panel ---- */
-  .panel{ display:flex; flex-direction:column; gap:16px; min-width:0; }
+  .panel-col{ display:flex; flex-direction:column; gap:16px; min-width:0; }
+  .empty{ background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:56px 22px; text-align:center; color:var(--paper-dim); }
+  .empty .glyph{ font-size:28px; color:var(--amber); font-family:'IBM Plex Mono',monospace; margin-bottom:12px; }
+  .empty p{ max-width:340px; margin:6px auto 0; font-size:13px; line-height:1.6; }
 
-  .empty{
-    background:var(--panel); border:1px solid var(--line); border-radius:14px;
-    padding:60px 24px; text-align:center; color:var(--paper-dim);
-  }
-  .empty .glyph{ font-size:30px; margin-bottom:14px; color:var(--amber); font-family:'IBM Plex Mono',monospace; }
-  .empty p{ max-width:360px; margin:8px auto 0; font-size:13.5px; line-height:1.6; }
-
-  .card{
-    background:var(--panel); border:1px solid var(--line); border-radius:14px; overflow:hidden;
-  }
-  .card-head{
-    display:flex; align-items:center; gap:12px; padding:18px 20px; border-bottom:1px solid var(--line);
-    flex-wrap:wrap;
-  }
+  .card{ background:var(--panel); border:1px solid var(--line); border-radius:14px; overflow:hidden; }
+  .card-head{ display:flex; align-items:center; gap:12px; padding:16px 18px; border-bottom:1px solid var(--line); flex-wrap:wrap; }
   .card-head .badge{
-    width:38px; height:38px; border-radius:10px; background:var(--ink-2);
-    display:flex; align-items:center; justify-content:center; font-size:15px; color:var(--amber);
-    font-family:'IBM Plex Mono',monospace; flex-shrink:0;
+    width:36px; height:36px; border-radius:10px; background:var(--ink-2); flex-shrink:0;
+    display:flex; align-items:center; justify-content:center; font-size:14px; color:var(--amber); font-family:'IBM Plex Mono',monospace;
   }
-  .card-head h2{ font-size:18px; font-weight:600; }
-  .card-head .path{ font-size:12px; color:var(--teal); font-family:'IBM Plex Mono',monospace; margin-top:2px; }
+  .card-head h2{ font-size:17px; font-weight:600; }
+  .card-head .path{ font-size:11.5px; color:var(--teal); font-family:'IBM Plex Mono',monospace; margin-top:2px; }
 
   .notes{ display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--line); }
-  @media (max-width:640px){ .notes{ grid-template-columns:1fr; } }
-  .note{ background:var(--panel); padding:16px 20px; }
-  .note h3{
-    font-size:11px; text-transform:uppercase; letter-spacing:0.07em; color:var(--paper-dim);
-    font-family:'IBM Plex Mono',monospace; margin-bottom:8px;
-  }
-  .note p{ font-size:13.5px; line-height:1.65; color:var(--paper); margin:0; }
+  @media (max-width:600px){ .notes{ grid-template-columns:1fr; } }
+  .note{ background:var(--panel); padding:14px 18px; }
+  .note h3{ font-size:10.5px; text-transform:uppercase; letter-spacing:0.07em; color:var(--paper-dim); font-family:'IBM Plex Mono',monospace; margin-bottom:7px; }
+  .note p{ font-size:13px; line-height:1.6; color:var(--paper); margin:0; }
   .note.role h3{ color:var(--amber); }
   .note.integration h3{ color:var(--teal); }
 
   .code-block{ border-top:1px solid var(--line); }
   .code-block .code-head{
-    display:flex; justify-content:space-between; align-items:center;
-    padding:10px 20px; font-family:'IBM Plex Mono',monospace; font-size:11px;
-    color:var(--paper-dim); background:var(--ink-2);
+    display:flex; justify-content:space-between; padding:9px 18px; font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px; color:var(--paper-dim); background:var(--ink-2);
   }
-  .code-block pre{
-    margin:0; padding:18px 20px; overflow-x:auto; font-family:'IBM Plex Mono',monospace;
-    font-size:12.5px; line-height:1.7; color:#c9e6da; background:#0a1620;
-  }
+  .code-block pre{ margin:0; padding:16px 18px; overflow-x:auto; font-family:'IBM Plex Mono',monospace; font-size:12px; line-height:1.65; color:#c9e6da; background:#0a1620; }
 
-  .log{
-    background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:14px 18px;
-    font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--paper-dim);
-    max-height:130px; overflow-y:auto;
-  }
-  .log .line{ padding:2px 0; }
-  .log .line .path{ color:var(--teal); }
-  .log-head{
-    display:flex; justify-content:space-between; font-size:10.5px; text-transform:uppercase;
-    letter-spacing:.07em; color:var(--paper-dim); opacity:.7; margin-bottom:8px;
-  }
-
-  /* ---- Intro ---- */
-  .intro{ padding:22px 0 26px; border-bottom:1px solid var(--line); margin-bottom:24px; max-width:760px; }
-  .eyebrow{
-    font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.09em; text-transform:uppercase;
-    color:var(--teal); margin:0 0 8px;
-  }
-  .intro h2{ font-size:clamp(20px,3vw,26px); font-weight:600; line-height:1.25; margin-bottom:12px; }
-  .intro p:not(.eyebrow){ font-size:14.5px; line-height:1.7; color:var(--paper-dim); margin:0; }
-
-  /* ---- Simulator ---- */
-  .sim{ margin-bottom:24px; }
-  .sim-body{ padding:18px 20px 22px; }
-  .sim-copy{ font-size:13px; color:var(--paper-dim); line-height:1.6; margin:0 0 16px; }
+  /* ---------- Simulator ---------- */
+  .sim-body{ padding:16px 18px 20px; }
+  .sim-copy{ font-size:12.5px; color:var(--paper-dim); line-height:1.6; margin:0 0 14px; }
   .sim-copy code{ color:var(--teal); }
-  .sim-controls{ display:flex; align-items:center; gap:14px; margin-bottom:16px; }
+  .sim-controls{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-bottom:14px; }
   .run-btn{
-    all:unset; cursor:pointer; background:var(--amber); color:#2a1a04; font-weight:600;
-    font-size:13px; padding:9px 18px; border-radius:9px; transition:opacity .15s ease;
+    all:unset; cursor:pointer; background:var(--amber); color:#2a1a04; font-weight:600; font-size:13px;
+    padding:9px 18px; border-radius:9px; transition:opacity .15s ease;
   }
   .run-btn:hover{ opacity:.88; }
   .run-btn:disabled{ opacity:.5; cursor:default; }
   .run-btn:focus-visible{ outline:2px solid var(--teal); outline-offset:2px; }
-  .sim-status{ font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--paper-dim); }
-
-  .sim-trace{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:0; }
+  .sim-status{ font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--paper-dim); }
+  .sim-trace{ list-style:none; margin:0; padding:0; }
   .sim-trace li{
-    display:flex; align-items:flex-start; gap:12px; padding:10px 0; border-bottom:1px solid var(--line-soft);
+    display:flex; gap:12px; padding:9px 0; border-bottom:1px solid var(--line-soft);
     opacity:0; transform:translateY(4px); transition:opacity .25s ease, transform .25s ease;
   }
   .sim-trace li.shown{ opacity:1; transform:translateY(0); }
   .sim-trace li:last-child{ border-bottom:none; }
   .sim-trace .step-icon{
-    width:26px; height:26px; border-radius:7px; background:var(--ink-2); flex-shrink:0;
-    display:flex; align-items:center; justify-content:center; font-size:12px; color:var(--amber);
-    font-family:'IBM Plex Mono',monospace;
+    width:24px; height:24px; border-radius:7px; background:var(--ink-2); flex-shrink:0; font-size:11px;
+    color:var(--amber); font-family:'IBM Plex Mono',monospace; display:flex; align-items:center; justify-content:center;
   }
-  .sim-trace .step-body .step-file{
-    font-family:'IBM Plex Mono',monospace; font-size:12.5px; color:var(--teal); margin-bottom:2px;
-  }
-  .sim-trace .step-body .step-desc{ font-size:13px; color:var(--paper); line-height:1.5; }
-
+  .sim-trace .step-file{ font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--teal); margin-bottom:2px; }
+  .sim-trace .step-desc{ font-size:12.5px; color:var(--paper); line-height:1.5; }
   .sim-response{
-    margin-top:16px; background:var(--ink-2); border:1px solid var(--line); border-radius:10px;
-    padding:14px 16px; font-family:'IBM Plex Mono',monospace; font-size:12px; color:#c9e6da;
-    white-space:pre-wrap;
+    margin-top:14px; background:var(--ink-2); border:1px solid var(--line); border-radius:10px; padding:13px 15px;
+    font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:#c9e6da; white-space:pre-wrap;
   }
+
+  .log{ background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:14px 18px; font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--paper-dim); max-height:130px; overflow-y:auto; }
+  .log-head{ display:flex; justify-content:space-between; font-size:10.5px; text-transform:uppercase; letter-spacing:.07em; opacity:.7; margin-bottom:8px; }
+  .log .line{ padding:2px 0; }
+  .log .line .path{ color:var(--teal); }
+
+  footer.foot{ border-top:1px solid var(--line); padding-top:18px; margin-top:44px; font-size:12px; color:var(--paper-dim); }
 </style>
 </head>
 <body>
+<div class="wrap">
 
-<div class="app">
   <header class="masthead">
     <div class="brand">
       <div class="mark">⚙</div>
       <div>
         <h1>Backend anatomy</h1>
-        <div class="sub">A guided dissection of a Node.js API service</div>
+        <div class="sub">Learn to structure a Node.js API</div>
       </div>
     </div>
-    <span class="tag">18 modules · Express + MongoDB</span>
+    <nav class="crumbs">
+      <a href="#lesson">The problem</a>
+      <a href="#conventions">Conventions</a>
+      <a href="#explorer">Explore the tree</a>
+      <a href="#simulator">See it run</a>
+    </nav>
   </header>
 
-  <section class="intro">
-    <p class="eyebrow">What this is</p>
-    <h2>Learn a backend by walking through a real one</h2>
+  <section class="hero" id="lesson">
+    <p class="eyebrow">Why this site exists</p>
+    <h2>Stop putting everything in server.js</h2>
     <p>
-      This is a working reference project — a small user-registration API built with Express and
-      MongoDB, laid out the way a production service actually gets organised: routes, middleware,
-      validation, controllers, services and models, each with one job. Click any file in the tree
-      to read what it does and why it lives where it does. Then use the request simulator below to
-      watch a real request travel through every one of those layers, in order, the same path it
-      would take on an actual server.
+      Most beginners write their first API in one file. It works, right up until that file is 600
+      lines of routes, database calls, password hashing, and error handling tangled together. This
+      site teaches <strong>separation of concerns</strong>: the practice of giving every part of your
+      backend exactly one job, in its own file, with a name that tells you what it does before you
+      even open it.
+    </p>
+    <p>
+      Below, you'll see a real signup endpoint built two ways — crammed into one file, and split
+      across the folders professional Node projects actually use — followed by the naming rules
+      that keep a growing codebase readable, and an explorer where you can inspect every file
+      yourself.
     </p>
   </section>
 
-  <section class="sim card" id="simCard">
-    <div class="card-head">
-      <div class="badge">▶</div>
-      <div>
-        <h2>Live request simulator</h2>
-        <div class="path">POST /api/v1/auth/register</div>
-      </div>
+  <section class="block" id="compare">
+    <div class="block-head">
+      <p class="eyebrow">01 · The problem, in code</p>
+      <h3>One file doing five jobs vs. five files doing one job each</h3>
+      <p>Same feature — user registration — written both ways. The left version works. The right version is the one you can still read in six months.</p>
     </div>
-    <div class="sim-body">
-      <p class="sim-copy">
-        This replays the real flow of <code>server.js</code> handling a signup request — no server
-        is actually running, but every step below matches the code you can inspect in the tree.
-      </p>
-      <div class="sim-controls">
-        <button type="button" id="runSim" class="run-btn">Run simulation</button>
-        <span class="sim-status" id="simStatus">Ready</span>
+    <div class="compare">
+      <div class="side bad">
+        <div class="side-label"><span class="dot"></span> server.js — everything, one file</div>
+        <pre><code>app.post('/register', async (req, res) => {
+  const { username, email, password } = req.body;
+  if (!username || !email || !password) {
+    return res.status(400).json({ error: 'Missing fields' });
+  }
+  const existing = await db.collection('users')
+    .findOne({ email });
+  if (existing) {
+    return res.status(400).json({ error: 'Email taken' });
+  }
+  const hashed = await bcrypt.hash(password, 10);
+  const user = await db.collection('users').insertOne({
+    username, email, password: hashed
+  });
+  const token = jwt.sign({ id: user.insertedId }, SECRET);
+  res.status(201).json({ token });
+});</code></pre>
+        <p class="verdict">Validation, database access, hashing, and token creation are all inline. Testing any one piece means running the whole route.</p>
       </div>
-      <ol class="sim-trace" id="simTrace"></ol>
-      <div class="sim-response" id="simResponse" hidden></div>
+      <div class="side good">
+        <div class="side-label"><span class="dot"></span> split by responsibility</div>
+        <pre><code>// routes/auth.routes.js
+router.post('/register', validateSchema(userSchema), registerUser);
+
+// controllers/authController.js
+export const registerUser = async (req, res) => {
+  const user = await registerNewUser(req.body);
+  res.status(201).json({ success: true, data: user });
+};
+
+// services/userService.js
+export const registerNewUser = async (data) => {
+  const hashed = await bcrypt.hash(data.password, 10);
+  return User.create({ ...data, password: hashed });
+};</code></pre>
+        <p class="verdict">Each file can be read, tested, and reused on its own. Change how passwords are hashed and only userService.js moves.</p>
+      </div>
     </div>
   </section>
 
-  <div class="layout">
-    <nav class="rail" aria-label="Project modules">
-      <div class="rail-label">Project tree</div>
-      <ul class="rail-list" id="railList"></ul>
-    </nav>
+  <section class="block" id="conventions">
+    <div class="block-head">
+      <p class="eyebrow">02 · Naming conventions</p>
+      <h3>A name should tell you the job before you open the file</h3>
+      <p>These are the conventions used throughout this project — consistent enough that a new file's purpose is obvious from its name alone.</p>
+    </div>
+    <div class="conv-grid" id="convGrid"></div>
+  </section>
 
-    <main class="panel">
-      <div id="detail"></div>
-      <section class="log">
-        <div class="log-head"><span>Activity log</span><span id="logCount">0 events</span></div>
-        <div id="logBody"></div>
-      </section>
-    </main>
-  </div>
+  <section class="block" id="explorer">
+    <div class="block-head">
+      <p class="eyebrow">03 · Explore the tree</p>
+      <h3>Every file, what it does, and how it connects</h3>
+      <p>Pick a file or folder to see its job, how it talks to the rest of the app, and a real code sample.</p>
+    </div>
+    <div class="explorer">
+      <nav class="rail" aria-label="Project modules">
+        <div class="rail-group">
+          <div class="rail-group-label">Folders</div>
+          <ul class="rail-list" id="railFolders"></ul>
+        </div>
+        <div class="rail-group">
+          <div class="rail-group-label">Root files</div>
+          <ul class="rail-list" id="railFiles"></ul>
+        </div>
+      </nav>
+      <div class="panel-col">
+        <div id="detail"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="simulator">
+    <div class="block-head">
+      <p class="eyebrow">04 · See it run</p>
+      <h3>Watch a request travel through every layer</h3>
+      <p>No server is actually running — this replays the real order of files handling a signup request, matching the code above.</p>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div class="badge">▶</div>
+        <div>
+          <h2>Live request simulator</h2>
+          <div class="path">POST /api/v1/auth/register</div>
+        </div>
+      </div>
+      <div class="sim-body">
+        <p class="sim-copy">Follows <code>server.js</code> → <code>routes</code> → <code>validation</code> → <code>controllers</code> → <code>services</code> → <code>models</code>, in that order.</p>
+        <div class="sim-controls">
+          <button type="button" id="runSim" class="run-btn">Run simulation</button>
+          <span class="sim-status" id="simStatus">Ready</span>
+        </div>
+        <ol class="sim-trace" id="simTrace"></ol>
+        <div class="sim-response" id="simResponse" hidden></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="log" aria-live="polite">
+    <div class="log-head"><span>Activity log</span><span id="logCount">0 events</span></div>
+    <div id="logBody"></div>
+  </section>
+
+  <footer class="foot">Backend anatomy — a reference layout for Express + MongoDB APIs. Built to teach separation of concerns, not to run in production.</footer>
 </div>
 
 <script type="module">
+"use strict";
+
 /**
- * Data module — describes each file/folder in the sample backend.
+ * Naming conventions taught alongside the folder structure.
+ */
+const conventions = [
+  { icon: "↝", name: "Routes", pattern: "name.routes.js", desc: "Plural resource, dot-routes suffix. auth.routes.js, user.routes.js." },
+  { icon: "▣", name: "Middleware", pattern: "verbAction.js", desc: "Named for what it does to the request: auth.js, rateLimit.js." },
+  { icon: "◎", name: "Controllers", pattern: "nameController.js", desc: "Singular domain + Controller. authController.js, orderController.js." },
+  { icon: "◆", name: "Services", pattern: "nameService.js", desc: "Singular domain + Service. userService.js, emailService.js." },
+  { icon: "▤", name: "Models", pattern: "Name.js (PascalCase)", desc: "Singular noun, capitalised — it names the thing, not the action. User.js, Order.js." },
+  { icon: "✓", name: "Validation", pattern: "nameSchema.js", desc: "What it validates + Schema. userSchema.js, orderSchema.js." }
+];
+
+/**
+ * Escapes HTML-sensitive characters before injecting code samples.
+ */
+const escapeHtml = (str) => str.replace(/[&<>]/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[ch]));
+
+/**
+ * Project structure — same reference API used throughout the lesson.
  */
 const structure = [
   {
@@ -505,13 +612,7 @@ app.listen(PORT, () => console.log(\`Server running on port \${PORT}\`));`
 ];
 
 /**
- * Escapes HTML-sensitive characters in code samples before injecting via innerHTML.
- */
-const escapeHtml = (str) =>
-  str.replace(/[&<>]/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[ch]));
-
-/**
- * ActivityLog — small append-only feed rendered into the footer log panel.
+ * ActivityLog — append-only feed shared by the explorer and the simulator.
  */
 class ActivityLog {
   #entries = [];
@@ -539,18 +640,20 @@ class ActivityLog {
 }
 
 /**
- * ModuleExplorer — owns the rail list and the detail panel, and keeps them in sync.
+ * ModuleExplorer — renders the folder/file rail (split into two groups so it
+ * never overflows into a cramped horizontal scroll) and the detail panel.
  */
 class ModuleExplorer {
   #items;
-  #railEl;
+  #folderRailEl;
+  #fileRailEl;
   #detailEl;
   #log;
-  #activeIndex = null;
 
-  constructor({ items, railEl, detailEl, log }) {
+  constructor({ items, folderRailEl, fileRailEl, detailEl, log }) {
     this.#items = items;
-    this.#railEl = railEl;
+    this.#folderRailEl = folderRailEl;
+    this.#fileRailEl = fileRailEl;
     this.#detailEl = detailEl;
     this.#log = log;
   }
@@ -561,21 +664,26 @@ class ModuleExplorer {
   }
 
   #renderRail() {
-    this.#railEl.innerHTML = this.#items
-      .map(
-        (item, index) => `
-        <li class="rail-item" data-index="${index}">
-          <button type="button" aria-current="false">
-            <span class="icon">${item.icon}</span>
-            <span>${item.name}${item.type === "folder" ? "/" : ""}</span>
-            <span class="kind">${item.type}</span>
-          </button>
-        </li>`
-      )
+    const rowHtml = (item, index) => `
+      <li data-index="${index}">
+        <button type="button" aria-current="false">
+          <span class="icon">${item.icon}</span>
+          <span>${item.name}${item.type === "folder" ? "/" : ""}</span>
+          <span class="kind">${item.type}</span>
+        </button>
+      </li>`;
+
+    this.#folderRailEl.innerHTML = this.#items
+      .map((item, index) => (item.type === "folder" ? rowHtml(item, index) : ""))
+      .join("");
+    this.#fileRailEl.innerHTML = this.#items
+      .map((item, index) => (item.type === "file" ? rowHtml(item, index) : ""))
       .join("");
 
-    this.#railEl.querySelectorAll(".rail-item button").forEach((btn, index) => {
-      btn.addEventListener("click", () => this.select(index));
+    [this.#folderRailEl, this.#fileRailEl].forEach((rail) => {
+      rail.querySelectorAll("li button").forEach((btn) => {
+        btn.addEventListener("click", () => this.select(Number(btn.closest("li").dataset.index)));
+      });
     });
   }
 
@@ -583,23 +691,25 @@ class ModuleExplorer {
     const item = this.#items[index];
     if (!item) return;
 
-    this.#activeIndex = index;
-    this.#railEl.querySelectorAll(".rail-item").forEach((li, i) => {
-      const isActive = i === index;
-      li.classList.toggle("active", isActive);
-      li.querySelector("button")?.setAttribute("aria-current", String(isActive));
+    [this.#folderRailEl, this.#fileRailEl].forEach((rail) => {
+      rail.querySelectorAll("li").forEach((li) => {
+        const isActive = Number(li.dataset.index) === index;
+        li.classList.toggle("active", isActive);
+        li.querySelector("button")?.setAttribute("aria-current", String(isActive));
+      });
     });
 
     this.#renderDetail(item);
     this.#log.push(item.path);
+    this.#detailEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }
 
   #renderEmptyState() {
     this.#detailEl.innerHTML = `
       <div class="empty">
         <div class="glyph">◈</div>
-        <h2>Select a module to inspect it</h2>
-        <p>Pick any file or folder from the tree to see what it's for, how it connects to the rest of the app, and a representative code sample.</p>
+        <h2>Select a file or folder to inspect it</h2>
+        <p>Pick anything from the tree to see what it's for, how it connects to the rest of the app, and a representative code sample.</p>
       </div>`;
   }
 
@@ -614,14 +724,8 @@ class ModuleExplorer {
           </div>
         </div>
         <div class="notes">
-          <div class="note role">
-            <h3>What it does</h3>
-            <p>${item.role}</p>
-          </div>
-          <div class="note integration">
-            <h3>How it connects</h3>
-            <p>${item.integration}</p>
-          </div>
+          <div class="note role"><h3>What it does</h3><p>${item.role}</p></div>
+          <div class="note integration"><h3>How it connects</h3><p>${item.integration}</p></div>
         </div>
         <div class="code-block">
           <div class="code-head">
@@ -635,8 +739,8 @@ class ModuleExplorer {
 }
 
 /**
- * RequestSimulator — replays the real request path through the module list,
- * step by step, ending in a mock response. Nothing here calls a real server.
+ * RequestSimulator — replays the real request path step by step. Nothing
+ * here calls a real server; it mirrors the code shown in the explorer.
  */
 class RequestSimulator {
   #steps = [
@@ -676,7 +780,7 @@ class RequestSimulator {
         (step) => `
         <li>
           <span class="step-icon">${step.icon}</span>
-          <span class="step-body">
+          <span>
             <div class="step-file">${step.file}</div>
             <div class="step-desc">${step.desc}</div>
           </span>
@@ -699,11 +803,32 @@ class RequestSimulator {
   }
 }
 
+/**
+ * Renders the naming-convention reference grid.
+ */
+const renderConventions = (mountEl) => {
+  mountEl.innerHTML = conventions
+    .map(
+      (c) => `
+      <div class="conv-card">
+        <div class="icon">${c.icon}</div>
+        <h4>${c.name}</h4>
+        <span class="pattern">${c.pattern}</span>
+        <p>${c.desc}</p>
+      </div>`
+    )
+    .join("");
+};
+
 document.addEventListener("DOMContentLoaded", () => {
+  renderConventions(document.getElementById("convGrid"));
+
   const log = new ActivityLog(document.getElementById("logBody"), document.getElementById("logCount"));
+
   const explorer = new ModuleExplorer({
     items: structure,
-    railEl: document.getElementById("railList"),
+    folderRailEl: document.getElementById("railFolders"),
+    fileRailEl: document.getElementById("railFiles"),
     detailEl: document.getElementById("detail"),
     log
   });
